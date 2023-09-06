@@ -1,13 +1,86 @@
 body {
+  width: 600px;
+  height: 400px;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  #root {
+    width: 100%;
+    height: 100%;
+  }
+  
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+
+.App {
+  margin: auto;
+  max-width: 800px;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: #333;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+/* List Styles */
+.SEOForm {
+  list-style: none;
+  padding: 0;
+}
+
+/* List Item Styles */
+.SEOValidation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin: 10px 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.SEOValidationField {
+  display: flex;
+  align-items: center;
+}
+
+.SEOValidationFieldTitle {
+  font-size: 1.2em;
+  margin-right: 10px;
+}
+
+/* Status Colors */
+.SEOValidationFieldStatus {
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.Error {
+  background-color: #f44336;
+  color: white;
+}
+
+.Ok {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Field Value Styles */
+.SEOValidationFieldValue {
+  font-size: 1em;
+  color: #666;
 }

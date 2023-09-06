@@ -2,6 +2,10 @@ import React from 'react';
 import './App.css';
 
 function App() {
+
+  const buttonClick = () => {
+    console.log('Button clicked!');
+  }
  return (
    <div className="App">
      <h1>SEO Extension built with React!</h1>
@@ -29,6 +33,7 @@ function App() {
          <div className="SEOVAlidationFieldValue">
            The main headline of the page (H1)
          </div>
+         <button onClick={buttonClick}>Click me!</button>
        </li>
      </ul>
    </div>

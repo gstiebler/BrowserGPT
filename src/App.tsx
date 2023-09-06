@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';
 
-import 'chrome' 
-
 function App() {
  return (
    <div className="App">
@@ -36,15 +34,5 @@ function App() {
    </div>
  );
 }
-
-// open chrome side panel
-chrome.devtools.panels.create("SEO", null, function(panel) {
-  panel.onShown.addListener(function(window) {
-    // append react app to the panel
-    window.document.body.appendChild(App());
-  });
-});
-
-chrome.sidePanel.open({ tabId: 5});
  
 export default App;

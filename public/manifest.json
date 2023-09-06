@@ -1,16 +1,25 @@
 {
-  "name": "Chrome React Extension",
-  "description": "Template for creating Chrome extensions with React",
-  "version": "1.0",
   "manifest_version": 3,
-  "action": {
-    "default_popup": "index.html",
-    "default_title": "Open the popup"
+  "name": "GuiGPT",
+  "version": "1.0",
+  "description": "GPT assistant with access to the browser",
+  "minimum_chrome_version": "116",
+  "background": {
+    "service_worker": "service-worker.js"
   },
+  "side_panel": {
+    "default_path": "sidepanel-global.html"
+  },
+  "content_scripts": [
+    {
+      "js": ["content-script.js"],
+      "matches": ["https://*/*"]
+    }
+  ],
+  "permissions": ["sidePanel", "contextMenus"],
   "icons": {
-    "16": "logo192.png",
-    "48": "logo192.png",
-    "128": "logo192.png"
-  },
-  "permissions": ["activeTab"]
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  }
 }

@@ -36,7 +36,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
       await chrome.sidePanel.open({ tabId: sender.tab.id });
       await chrome.sidePanel.setOptions({
         tabId: sender.tab.id,
-        path: 'sidepanel-tab.html',
+        path: 'index.html',
         enabled: true
       });
     }

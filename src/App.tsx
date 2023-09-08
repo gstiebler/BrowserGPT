@@ -5,7 +5,10 @@ function App() {
 
   const buttonClick = () => {
     console.log('Button clicked!');
-    chrome.runtime.sendMessage({ type: 'execute' });
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      const currentTab = tabs[0];
+      chrome.tabs.sendMessage(currentTab.id ?? 0, { type: 'execute' });
+    });
   }
 
   return (

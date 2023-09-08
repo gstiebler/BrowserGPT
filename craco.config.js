@@ -4,7 +4,7 @@ module.exports = {
             return {
                 ...webpackConfig,
                 entry: {
-                    main: [env === 'development' && require.resolve('react-dev-utils/webpackHotDevClient'),paths.appIndexJs].filter(Boolean),
+                    main: './src/index.tsx',
                     content: './src/DOMEvaluator.ts',
                 },
                 output: {

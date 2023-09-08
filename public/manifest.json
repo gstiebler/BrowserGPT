@@ -16,6 +16,14 @@
       "matches": ["https://*/*"]
     }
   ],
+  "web_accessible_resources": [
+    {
+        "resources": [
+            "*.map"
+        ],
+        "matches": ["https://*/*"]
+    }
+  ],
   "permissions": ["sidePanel", "contextMenus"],
   "icons": {
     "16": "images/icon-16.png",

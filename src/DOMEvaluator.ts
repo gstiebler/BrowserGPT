@@ -1,22 +1,39 @@
+import { execute } from './gpt/browserDriver';
 
 const button = new DOMParser().parseFromString(
-'<button>Click to open side panel</button>',
-'text/html'
+    '<button>Click to open side panel</button>',
+    'text/html'
 ).body.firstElementChild!;
+
+console.log('Yes, it opened');
 
 button.addEventListener('click', function () {
     chrome.runtime.sendMessage({ type: 'open_side_panel' });
 });
 document.body.append(button);
 
-// Listen for messages
-chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-// If the received message has the expected format...
-if (msg.text === 'report_back') {
-    // Call the specified callback, passing
-    // the web-page's DOM content as argument
-    sendResponse(document.body);
+async function messagesFromReactApp(
+    msg: any,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response: any) => void
+) {
+    console.log(`Received message from React app: ${JSON.stringify(msg)}`);
+    if (msg.type == 'execute') {
+        await execute();
+    }
 }
-});
-  
-export function fun() {}
+
+chrome.runtime.onMessage.addListener(messagesFromReactApp);
+
+export function fun() { }
+
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+      console.log(sender.tab ?
+                  "from a content script:" + sender.tab.url :
+                  "from the extension");
+      if (request.greeting === "hello")
+        sendResponse({farewell: "goodbye"});
+    }
+  );

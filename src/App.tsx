@@ -1,10 +1,12 @@
 import React from 'react';
 import './App.css';
+import { execute } from './gpt/browserDriver';
 
 function App() {
 
   const buttonClick = () => {
     console.log('Button clicked!');
+    execute();
   }
  return (
    <div className="App">

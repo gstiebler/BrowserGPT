@@ -9,6 +9,13 @@ import { text } from "stream/consumers";
 export function summarize(document: Document): any {
     const extractor = new HtmlExtraction();
     const result = extractor.processTagsRecursive(document.body);
+    const summary = printTagsRecursive(result);
+    return summary;
+}
+
+export function compact(summary: any) {
+    const str = JSON.stringify(summary);
+    const result = str.replace(/"/g, '');
     return result;
 }
 
@@ -20,6 +27,50 @@ function getImmediateTextContent(node: Element): string | null {
     return clonedNode.textContent;
 }
 
+function printTagsRecursive(node: any) {
+    const children = node['children'] as any[];
+    const line = node['line']
+    const key = line["key"]
+
+    let children_items = children
+        .map(printTagsRecursive)
+        .filter(Boolean) as any;
+    
+    if (children_items.length == 1) {
+        children_items = children_items[0]
+    }
+
+    let value = line["value"];
+
+    if (value instanceof String) {
+        value = value.replace('\n', ' ').trim();
+        // replace multiple spaces with single space
+        value = value.split().join();
+        const result = [] as any[];
+        if (value != '') {
+            result.push(value)
+        }
+        if (!_.isEmpty(children_items)) {
+            result.push(children_items)
+        }
+        if (result.length == 0) {
+            return null
+        } else if (result.length == 1) {
+            return result[0]
+        } else {
+            return result
+        }
+    } else {
+        if (_.isEmpty(value)) {
+            return children_items
+        } else {
+            if (!_.isEmpty(children_items)) {
+                value['children'] = children_items
+            }
+            return value
+        }
+    }
+}
 
 class HtmlExtraction {
     key_map = {} as { [key: string]: any };
@@ -64,10 +115,12 @@ class HtmlExtraction {
 
         if (element.tagName == 'A') {
             const input_props = {
-                text: directText,
                 type: 'link',
                 href: element.getAttribute('href'),
-            }
+            } as any;
+            if (!_.isEmpty(directText)) {
+                input_props['text'] = directText;
+            }    
 
             const line = { key: 'link', value: input_props };
             return { line: line, "children": children };

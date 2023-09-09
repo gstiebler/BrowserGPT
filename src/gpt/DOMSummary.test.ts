@@ -12,7 +12,7 @@ describe("test add function", () => {
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
         const result = summarize(dom.window.document);
-        // console.log(dom.window.document.querySelector("p")?.textContent); // "Hello world"
+        console.log(JSON.stringify(result, null, 2));
         expect(result).toBe(15);
     });
 });

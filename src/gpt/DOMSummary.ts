@@ -4,9 +4,19 @@ global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
 import _ from "lodash";
-import { text } from "stream/consumers";
 
-export function summarize(document: Document): any {
+
+// define the type TLine
+type TLine = {
+    key: string;
+    value: any;
+}
+type TSummaryNode = {
+    line: TLine;
+    children: TSummaryNode[];
+}
+
+export function summarize(document: Document) {
     const extractor = new HtmlExtraction();
     const result = extractor.processTagsRecursive(document.body);
     const summary = printTagsRecursive(result);
@@ -15,7 +25,7 @@ export function summarize(document: Document): any {
 
 export function compact(summary: any) {
     const str = JSON.stringify(summary);
-    const result = str.replace(/"/g, '');
+    const result = str.replaceAll('"', '');
     return result;
 }
 
@@ -28,9 +38,9 @@ function getImmediateTextContent(node: Element): string | null {
 }
 
 function printTagsRecursive(node: any) {
-    const children = node['children'] as any[];
-    const line = node['line']
-    const key = line["key"]
+    const children = node.children as any[];
+    const line = node.line;
+    const key = line.key;
 
     let children_items = children
         .map(printTagsRecursive)
@@ -40,7 +50,7 @@ function printTagsRecursive(node: any) {
         children_items = children_items[0]
     }
 
-    let value = line["value"];
+    let value = line.value;
 
     if (value instanceof String) {
         value = value.replace('\n', ' ').trim();
@@ -65,7 +75,7 @@ function printTagsRecursive(node: any) {
             return children_items
         } else {
             if (!_.isEmpty(children_items)) {
-                value['children'] = children_items
+                value.children = children_items
             }
             return value
         }
@@ -83,10 +93,10 @@ class HtmlExtraction {
     input_show_props = new Set(["name", "type", "placeholder", "aria-label", "id", "value"]);
     always_show_tags = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT']);
 
-    processTagsRecursive(element: Element) {
+    processTagsRecursive(element: Element): TSummaryNode | TSummaryNode[] {
         const childNodes = [...element.childNodes];
         const html = element.innerHTML;
-        const children = [] as any[];
+        const children = [] as TSummaryNode[];
         for (const child of element.childNodes) {
             if (this.forbiddenProps.has((child as Element).tagName)) {
                 continue;
@@ -99,7 +109,7 @@ class HtmlExtraction {
             }
         }
 
-        const directText = getImmediateTextContent(element)?.trim();
+        const directText = getImmediateTextContent(element)?.trim()
         const text_is_empty = _.isEmpty(directText);
         
         /*
@@ -119,11 +129,11 @@ class HtmlExtraction {
                 href: element.getAttribute('href'),
             } as any;
             if (!_.isEmpty(directText)) {
-                input_props['text'] = directText;
+                input_props.text = directText;
             }    
 
-            const line = { key: 'link', value: input_props };
-            return { line: line, "children": children };
+            const line: TLine = { key: 'link', value: input_props };
+            return { line, children };
         }
         // define a type with key as string, value as any
 
@@ -143,32 +153,32 @@ class HtmlExtraction {
                 return children
             }
 
-            input_props['text'] = directText;
+            input_props.text = directText;
 
-            if (!input_props['type']) {
-                input_props['type'] = element.nodeName;
+            if (!input_props.type) {
+                input_props.type = element.nodeName;
             }
 
             // filter props with empty values
             const filteredInputProps = _.pickBy(input_props, (value, key) => !_.isEmpty(value));
 
-            const originalId = filteredInputProps['id'];
+            const originalId = filteredInputProps.id;
             if (originalId) {
                 this.id_counter += 1
                 const new_id = `id${this.id_counter}`;
-                filteredInputProps['id'] = new_id;
+                filteredInputProps.id = new_id;
                 this.key_map[new_id] = originalId;
             }
 
-            const original_name = filteredInputProps['name'];
+            const original_name = filteredInputProps.name;
             if (original_name) {
                 this.name_counter += 1
                 const new_name = `name${this.name_counter}`;
-                filteredInputProps['name'] = new_name
+                filteredInputProps.name = new_name
                 this.name_map[new_name] = original_name
             }
 
-            const line = { key: element.nodeName, value: filteredInputProps };
+            const line: TLine = { key: element.nodeName, value: filteredInputProps };
             return { line, children };
         }
         const new_line = { key: element.nodeName, value: directText };

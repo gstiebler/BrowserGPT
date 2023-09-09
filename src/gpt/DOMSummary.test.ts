@@ -12,7 +12,9 @@ describe("test add function", () => {
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
         const summary = summarize(dom.window.document);
-        console.log(compact(summary));
+        const compactSummary = compact(summary);
+        console.log(JSON.stringify(summary, null, 2));
+        console.log(compactSummary);
         expect(summary).toBe(15);
     });
 });

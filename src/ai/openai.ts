@@ -2,7 +2,7 @@
 import OpenAI from "openai";
 
 export async function send(apiKey: string, content: string): Promise<OpenAI.Chat.Completions.ChatCompletion> {
-    const openai = new OpenAI({ apiKey });
+    const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
     const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [

@@ -1,39 +1,76 @@
-.extension-tab {
-  font-family: Arial, Helvetica, sans-serif;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Updated to 100% to match the width of the tab */
-  margin: 0 auto;
-  box-sizing: border-box; /* Ensures padding doesn't expand beyond 100% width */
-}
-
-.input-group {
-  margin-bottom: 10px;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 8px;
+.futuristic-container {
+  background: linear-gradient(45deg, #0f0f0f, #1c1c1c);
+  color: #00ffea;
+  font-family: 'Arial', sans-serif;
+  height: 100vh;
+  padding: 2rem;
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+}
+
+.intro-text {
+  margin-bottom: 2rem;
+}
+
+.api-key-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+label {
+  margin-bottom: 0.5rem;
+}
+
+input[type="text"] {
+  padding: 0.5rem;
+  border: 2px solid #00ffea;
+  background-color: transparent;
+  color: #00ffea;
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+.chat-interface {
+  border: 2px solid #00ffea;
+  padding: 1rem;
+  height: 400px;
+  position: relative;
+}
+
+.chat-log {
+  overflow-y: auto;
+  height: 80%;
+}
+
+.chat-input {
+  position: absolute;
+  bottom: 1rem;
+  width: 100%;
 }
 
 button {
-  padding: 10px 15px;
-  background-color: #007BFF;
-  color: white;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 4px;
+  background-color: #00ffea;
+  color: #0f0f0f;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin-left: 0.5rem;
 }
 
-button:hover {
-  background-color: #0056b3;
+.user {
+  background-color: #00ffea;
+  color: #0f0f0f;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  width: fit-content;
+  margin: 0.5rem 0 0.5rem auto;
+}
+
+.system {
+  background-color: #1c1c1c;
+  border: 1px solid #00ffea;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  width: fit-content;
+  margin: 0.5rem auto 0.5rem 0;
 }

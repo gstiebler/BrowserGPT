@@ -1,4 +1,4 @@
-import { execute } from './gpt/browserDriver';
+import { execute } from './html/browserDriver';
 
 const button = new DOMParser().parseFromString(
     '<button>Click to open side panel</button>',

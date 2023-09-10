@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import './ExtensionTab.css';
+import { send } from '../ai/openai';
 
 const ExtensionTab: React.FC = () => {
     const [apiKey, setApiKey] = useState<string>('');
 
-    const handleSend = () => {
+    const handleSend = async () => {
         console.log('API Key:', apiKey);
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
           const currentTab = tabs[0];
           chrome.tabs.sendMessage(currentTab.id ?? 0, { type: 'execute' });
         });
+        const result = await send(apiKey, "Hello!");
+        console.log(JSON.stringify(result));
     };
 
     return (

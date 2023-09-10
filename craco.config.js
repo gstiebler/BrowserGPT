@@ -5,7 +5,7 @@ module.exports = {
                 ...webpackConfig,
                 entry: {
                     main: './src/index.tsx',
-                    content: './src/DOMEvaluator.ts',
+                    content: './src/content/DOMEvaluator.ts',
                 },
                 output: {
                     ...webpackConfig.output,

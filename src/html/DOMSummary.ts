@@ -1,8 +1,4 @@
 import _ from "lodash";
-const { TextEncoder, TextDecoder } = require('text-encoding');
-
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
 
 // define the type TLine
 type TLine = {

@@ -18,7 +18,7 @@ type TSummaryNode = {
 
 export function summarize(document: Document) {
     const extractor = new HtmlExtraction();
-    const result = extractor.processTagsRecursive(document.body);
+    const result = extractor.processTagsRecursive(document.body) as TSummaryNode;
     const summary = printTagsRecursive(result);
     return summary;
 }
@@ -37,7 +37,7 @@ function getImmediateTextContent(node: Element): string | null {
     return clonedNode.textContent;
 }
 
-function printTagsRecursive(node: any) {
+function printTagsRecursive(node: TSummaryNode) {
     const children = node.children as any[];
     const line = node.line;
     const key = line.key;
@@ -53,7 +53,10 @@ function printTagsRecursive(node: any) {
     let value = line.value;
 
     if (value instanceof String) {
-        value = value.replace('\n', ' ').trim();
+        value = value
+            .replaceAll('\n', ' ')
+            .replaceAll('  ', ' ')
+            .trim();
         // replace multiple spaces with single space
         value = value.split().join();
         const result = [] as any[];

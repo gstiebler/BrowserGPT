@@ -1,12 +1,14 @@
 import _ from "lodash";
 
-type Command = {
+export type Command = {
     name: string;
     params: string[];
 };
 
+export const commandsSeparatorStr = '%%%';
+
 export function extractCommands(aiMessage: string): Command[] {
-    const [userMessage, commandsText] = aiMessage.split('%%%');
+    const [userMessage, commandsText] = aiMessage.split(commandsSeparatorStr);
     if (_.isEmpty(commandsText)) {
         return [];
     }

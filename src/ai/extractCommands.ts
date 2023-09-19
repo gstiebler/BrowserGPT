@@ -26,3 +26,8 @@ export function extractCommands(aiMessage: string): Command[] {
     });
     return commands;
 }
+
+export function extractMessageToUser(llmMessage: string): string {
+    const [userMessage, commandsText] = llmMessage.split(commandsSeparatorStr);
+    return userMessage;
+}

@@ -1,4 +1,4 @@
-import { commandsSeparatorStr, extractCommands } from "../ai/extractCommands";
+import { commandsSeparatorStr, extractCommands, extractMessageToUser,  } from "../ai/extractCommands";
 import { Chat, HTMLDoc, LLM, Orquestrator } from "./orquestrator";
 
 const promptSource = {
@@ -28,7 +28,7 @@ describe("orquestrator", () => {
     let llmMock: LLM;
     let htmlDocumentMock: HTMLDoc;
     let chatMock: Chat;
-    const commandExtractor = { extractCommands };
+    const commandExtractor = { extractCommands, extractMessageToUser };
 
     beforeEach(() => {
         llmMock = { send: jest.fn() };
@@ -58,17 +58,23 @@ describe("orquestrator", () => {
                     </body>
                 </html>
             `;
-            llmMock.send = jest.fn().mockResolvedValue(firstLLMResult);
-            htmlDocumentMock.readBrowser = jest.fn().mockReturnValue(firstHtml);
+            const secondLLMResult = `Now I'll read the browser ${commandsSeparatorStr} read_browser() ${commandsSeparatorStr}`;
+
+            llmMock.send = jest.fn()
+                .mockReturnValueOnce(firstLLMResult)
+                .mockReturnValueOnce(secondLLMResult);
+
+            htmlDocumentMock.readBrowser = jest.fn().mockReturnValueOnce(firstHtml);
     
             await orquestrator.userMessageArrived(firstUserMessage);
-            expect(llmMock.send).toBeCalledWith([
-                { role: "assistant", message: promptSource.getMainSystemPromp() },
+            expect(llmMock.send).nthCalledWith(0, [
+                { role: "agent", message: promptSource.getMainSystemPromp() },
                 { role: "user", message: firstUserMessage },
             ]);
-            expect(llmMock.send).toBeCalledWith([
-                { role: "assistant", message: promptSource.getMainSystemPromp() },
+            expect(llmMock.send).nthCalledWith(1, [
+                { role: "agent", message: promptSource.getMainSystemPromp() },
                 { role: "user", message: firstUserMessage },
+                { role: "agent", message: `result: ${firstHtml}` },
             ]);
         }
        

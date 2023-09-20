@@ -52,11 +52,14 @@ describe("orquestrator", () => {
     it("happy path", async () => {
         const orquestrator = new Orquestrator(llmMock, htmlDocumentMock, chatMock, promptSource, commandExtractor);
 
-        const sendReceiptUserMsg = "I want to send my massage receipt to Canada Life";
+
         const openLinkLlmMsg = `Now I'll open the link www.canadalife.com ${commandsSeparatorStr} open_link(www.canadalife.com) ${commandsSeparatorStr}`;
+        const askLoginPasswordLlmMsg = `What's your user name and password?`;
         const userPassCommands = ['set_input_value("id1", "myuser")', 'set_input_value("id2", "mypass")', 'click_submit("id3")'];
         const fillUserPassLlmMsg = `I'll set the user and password ${commandsSeparatorStr} ${userPassCommands.join('\n')} ${commandsSeparatorStr}`;
-        const askLoginPasswordLlmMsg = `What's your user name and password?`;
+        const openClainLlmMsg = `Now I'll open the link /make_a_claim ${commandsSeparatorStr} open_link(/make_a_claim) ${commandsSeparatorStr}`;
+
+        const sendReceiptUserMsg = "I want to send my massage receipt to Canada Life";
         const loginPageHtml = `
             <html>
                 <body>
@@ -72,27 +75,33 @@ describe("orquestrator", () => {
         // 1. user sends initial prompt
         llmMock.send = jest.fn()
             .mockReturnValueOnce(openLinkLlmMsg)
-            .mockReturnValueOnce(askLoginPasswordLlmMsg);
+            .mockReturnValueOnce(askLoginPasswordLlmMsg)
+            .mockReturnValueOnce(fillUserPassLlmMsg)
+            .mockReturnValueOnce(openClainLlmMsg);
 
         await orquestrator.userMessageArrived(sendReceiptUserMsg);
+        // Orquestrator calls LLM, which returned openLinkLlmMsg
+        // Orquestrator shows the new LLM message to the user
+        // Orquestrator calls htmlDocument.openLink
         expect(llmMock.send).nthCalledWith(0, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
         ]);
-        // Orquestrator calls LLM, which returned openLinkLlmMsg
         expect(chatMock.showMessages).nthCalledWith(0, [
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: "Now I'll open the link www.canadalife.com" },
         ]);
         expect(htmlDocumentMock.openLink).nthCalledWith(0, "www.canadalife.com");
+
         await orquestrator.htmlDocumentChanged(new JSDOM(loginPageHtml).window.document);
+        // Orquestrator calls LLM, which returned askLoginPasswordLlmMsg
+        // Orquestrator asks for login and password to the user
         expect(llmMock.send).nthCalledWith(1, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },
             { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
         ]);
-        // Orquestrator asks for login and password to the user
         expect(chatMock.showMessages).nthCalledWith(1, [
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: "Now I'll read the browser" },
@@ -102,6 +111,9 @@ describe("orquestrator", () => {
         // 2. user sends login and password
         const userPassUserMsg = "myuser mypass";
         await orquestrator.userMessageArrived(userPassUserMsg);
+        // Orquestrator calls LLM, which returned fillUserPassLlmMsg
+        // Orquestrator shows the new LLM message to the user
+        // Orquestrator calls htmlDocument.setInputValue and htmlDocument.clickSubmit
         expect(llmMock.send).nthCalledWith(2, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
@@ -109,11 +121,46 @@ describe("orquestrator", () => {
             { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
             { role: "user", message: userPassUserMsg },
         ]);
+        expect(chatMock.showMessages).nthCalledWith(2, [
+            { role: "user", message: sendReceiptUserMsg },
+            { role: "system", message: "Now I'll read the browser" },
+            { role: "system", message: askLoginPasswordLlmMsg },
+            { role: "user", message: userPassUserMsg },
+        ]);
         expect(htmlDocumentMock.setInputValue).nthCalledWith(0, "id1", "myuser");
         expect(htmlDocumentMock.setInputValue).nthCalledWith(1, "id2", "mypass");
         expect(htmlDocumentMock.clickSubmit).nthCalledWith(0, "id3");
-        await orquestrator.htmlDocumentChanged(new JSDOM(loginPageHtml).window.document);
-        
+
+        const initialPageHtml = `
+            <html>
+                <body>
+                    <a href="/make_a_claim">Make a Claim</a>
+                </body>
+            </html>
+        `;
+        await orquestrator.htmlDocumentChanged(new JSDOM(initialPageHtml).window.document);
+        // Orquestrator calls LLM, which returned open_link(/make_a_claim)
+        // Orquestrator shows the new LLM message to the user
+        // Orquestrator calls htmlDocument.openLink
+        expect(llmMock.send).nthCalledWith(3, [
+            { role: "agent", message: promptSource.getMainSystemPromp() },
+            { role: "user", message: sendReceiptUserMsg },
+            { role: "system", message: openLinkLlmMsg },               
+            { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
+            { role: "user", message: userPassUserMsg },
+            { role: "system", message: fillUserPassLlmMsg },  
+            { role: "agent", message: `result: ${summarizeHtml(initialPageHtml)}` },
+        ]);
+        expect(chatMock.showMessages).nthCalledWith(3, [
+            { role: "user", message: sendReceiptUserMsg },
+            { role: "system", message: "Now I'll read the browser" },
+            { role: "system", message: askLoginPasswordLlmMsg },
+            { role: "user", message: userPassUserMsg },
+            { role: "system", message: "I'll set the user and password" },
+            { role: "system", message: "Now I'll read the browser" },
+            
+        ]);
+        expect(htmlDocumentMock.openLink).nthCalledWith(1, "/make_a_claim");
     });
 
 });

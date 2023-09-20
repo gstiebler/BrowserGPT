@@ -1,4 +1,5 @@
 import { Command } from "../ai/extractCommands";
+import { compact, summarize } from "../html/DOMSummary";
 
 export type LLMMessage = {
     role: 'system' | 'agent' | 'user';
@@ -11,10 +12,9 @@ export interface LLM {
 
 export interface HTMLDoc {
     setInputValue(id: string, value: string): void;
-    followLink(link: string): void;
-    clickButton(id: string): void;
+    openLink(link: string): void;
+    clickSubmit(id: string): void;
     selectOption(id: string, value: string): void;
-    readBrowser(): string;
 }
 
 export type ChatMessage = {
@@ -61,6 +61,17 @@ export class Orquestrator {
         this.getAndExecuteCommands();
     }
 
+    async htmlDocumentChanged(document: Document) {
+        const summary = summarize(document);
+        const compactSummary = compact(summary);
+        this.llmMessagesHistory = [
+            ...this.llmMessagesHistory,
+            { role: 'agent', message: `result: ${compactSummary}` },
+        ]
+
+        this.getAndExecuteCommands();
+    }
+
     private async getAndExecuteCommands() {
         const result1 = await this.llm.send(this.llmMessagesHistory);
         const commands = this.commandExtractor.extractCommands(result1);
@@ -74,25 +85,14 @@ export class Orquestrator {
         for (const command of commands) {
             const commandsFunctions = {
                 'set_input_value': this.htmlDocument.setInputValue,
-                'follow_link': this.htmlDocument.followLink,
-                'click_button': this.htmlDocument.clickButton,
+                'open_link': this.htmlDocument.openLink,
+                'click_submit': this.htmlDocument.clickSubmit,
                 'select_option': this.htmlDocument.selectOption,
-                'read_browser': this.readBrowser,
             } as { [key: string]: Function };
             
             const commandFn = commandsFunctions[command.name];
             commandFn(...command.params);
         }
-    }
-
-    private async readBrowser() {
-        const html = this.htmlDocument.readBrowser();
-        this.llmMessagesHistory = [
-            ...this.llmMessagesHistory,
-            { role: 'agent', message: `result: ${html}` },
-        ]
-
-        this.getAndExecuteCommands();
     }
 
 }

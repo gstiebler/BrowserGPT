@@ -29,5 +29,5 @@ export function extractCommands(aiMessage: string): Command[] {
 
 export function extractMessageToUser(llmMessage: string): string {
     const [userMessage, commandsText] = llmMessage.split(commandsSeparatorStr);
-    return userMessage;
+    return userMessage.trim();
 }

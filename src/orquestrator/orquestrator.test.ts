@@ -52,7 +52,6 @@ describe("orquestrator", () => {
     it("happy path", async () => {
         const orquestrator = new Orquestrator(llmMock, htmlDocumentMock, chatMock, promptSource, commandExtractor);
 
-
         const openLinkLlmMsg = `Now I'll open the link www.canadalife.com ${commandsSeparatorStr} open_link(www.canadalife.com) ${commandsSeparatorStr}`;
         const askLoginPasswordLlmMsg = `What's your user name and password?`;
         const userPassCommands = ['set_input_value("id1", "myuser")', 'set_input_value("id2", "mypass")', 'click_submit("id3")'];
@@ -83,26 +82,26 @@ describe("orquestrator", () => {
         // Orquestrator calls LLM, which returned openLinkLlmMsg
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
-        expect(llmMock.send).nthCalledWith(0, [
+        expect(llmMock.send).nthCalledWith(1, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
         ]);
-        expect(chatMock.showMessages).nthCalledWith(0, [
+        expect(chatMock.showMessages).nthCalledWith(1, [
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: "Now I'll open the link www.canadalife.com" },
         ]);
-        expect(htmlDocumentMock.openLink).nthCalledWith(0, "www.canadalife.com");
+        expect(htmlDocumentMock.openLink).nthCalledWith(1, "www.canadalife.com");
 
         await orquestrator.htmlDocumentChanged(new JSDOM(loginPageHtml).window.document);
         // Orquestrator calls LLM, which returned askLoginPasswordLlmMsg
         // Orquestrator asks for login and password to the user
-        expect(llmMock.send).nthCalledWith(1, [
+        expect(llmMock.send).nthCalledWith(2, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },
             { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
         ]);
-        expect(chatMock.showMessages).nthCalledWith(1, [
+        expect(chatMock.showMessages).nthCalledWith(2, [
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: "Now I'll read the browser" },
             { role: "system", message: askLoginPasswordLlmMsg },
@@ -114,14 +113,14 @@ describe("orquestrator", () => {
         // Orquestrator calls LLM, which returned fillUserPassLlmMsg
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.setInputValue and htmlDocument.clickSubmit
-        expect(llmMock.send).nthCalledWith(2, [
+        expect(llmMock.send).nthCalledWith(3, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },               
             { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
             { role: "user", message: userPassUserMsg },
         ]);
-        expect(chatMock.showMessages).nthCalledWith(2, [
+        expect(chatMock.showMessages).nthCalledWith(3, [
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: "Now I'll read the browser" },
             { role: "system", message: askLoginPasswordLlmMsg },
@@ -142,7 +141,7 @@ describe("orquestrator", () => {
         // Orquestrator calls LLM, which returned open_link(/make_a_claim)
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
-        expect(llmMock.send).nthCalledWith(3, [
+        expect(llmMock.send).nthCalledWith(4, [
             { role: "agent", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },               
@@ -151,7 +150,7 @@ describe("orquestrator", () => {
             { role: "system", message: fillUserPassLlmMsg },  
             { role: "agent", message: `result: ${summarizeHtml(initialPageHtml)}` },
         ]);
-        expect(chatMock.showMessages).nthCalledWith(3, [
+        expect(chatMock.showMessages).nthCalledWith(4, [
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: "Now I'll read the browser" },
             { role: "system", message: askLoginPasswordLlmMsg },

@@ -74,6 +74,10 @@ export class Orquestrator {
 
     private async getAndExecuteCommands() {
         const result1 = await this.llm.send(this.llmMessagesHistory);
+        this.llmMessagesHistory = [
+            ...this.llmMessagesHistory,
+            { role: 'system', message: result1 },
+        ]
         const commands = this.commandExtractor.extractCommands(result1);
         const msgToUser = this.commandExtractor.extractMessageToUser(result1);
         this.userMessagesHistory.push({ role: 'system', message: msgToUser });

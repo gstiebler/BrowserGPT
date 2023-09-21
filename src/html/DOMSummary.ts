@@ -13,7 +13,8 @@ type TSummaryNode = {
 export function summarize(document: Document) {
     const extractor = new HtmlExtraction();
     const result = extractor.processTagsRecursive(document.body) as TSummaryNode;
-    const summary = printTagsRecursive(result);
+    const toPrint = result instanceof Array ? result[0] : result;
+    const summary = printTagsRecursive(toPrint);
     return summary;
 }
 

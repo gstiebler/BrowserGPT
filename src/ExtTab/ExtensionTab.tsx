@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { send } from '../ai/openai';
+import React, { useEffect, useState } from 'react';
 import './ExtensionTab.css';
 import { Chat, ChatMessage, LLM, LLMMessage, Orquestrator } from '../orquestrator/orquestrator';
 import * as openai from '../ai/openai';
@@ -11,10 +10,12 @@ type TChatItem = {
     message: string;
 };
 
-function sendMessageToUserTab() {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+async function sendMessageToUserTab(payload: any) {
+    return chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentTab = tabs[0];
-        chrome.tabs.sendMessage(currentTab.id ?? 0, { type: 'execute' });
+        const result = chrome.tabs.sendMessage(currentTab.id ?? 0, payload);
+        console.log(result);
+        return result;
     });
 }
 
@@ -27,10 +28,19 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
     };
 
     const htmlDoc = {
-        setInputValue: (id: string, value: string) => {},
-        openLink: (link: string) => {},
-        clickSubmit: (id: string) => {},
-        selectOption: (id: string, value: string) => {},
+        setInputValue: (id: string, value: string) => {
+            sendMessageToUserTab({ command: 'setInputValue', id, value });
+        },
+        openLink: async (link: string) => {
+            const result = await sendMessageToUserTab({ command: 'openLink', link });
+            console.log(result);
+        },
+        clickSubmit: (id: string) => {
+            sendMessageToUserTab({ command: 'clickSubmit', id });
+        },
+        selectOption: (id: string, value: string) => {
+            sendMessageToUserTab({ command: 'selectOption', id, value });
+        },
     };
     
     const commandExtractor = { extractCommands, extractMessageToUser };
@@ -45,14 +55,22 @@ const ExtensionTab = () => {
     const [chatLog, setChatLog] = useState<TChatItem[]>([]);
     const [orquestrator, setOrchestator] = useState<Orquestrator | null>(null);
 
-    const onNewApiKey = (apiKey: string) => {
+    useEffect(() => {
         const chat = {
             showMessages: (messages: ChatMessage[]) => {
                 setChatLog(messages);
             },
         }
-        setOrchestator(getOrquestrator(apiKey, chat));
-    };
+        const orquestrator = getOrquestrator(apiKey, chat);
+
+        chrome.runtime.onMessage.addListener((msg: any) => {
+            if (msg.type == 'htmlDocumentChanged') {
+                orquestrator.htmlDocumentChanged(msg.compactHtml);
+            }
+        });
+
+        setOrchestator(orquestrator);
+    }, [apiKey]);
 
     const handleSendMessage = async () => {
         if (!chatMessage) {
@@ -74,7 +92,7 @@ const ExtensionTab = () => {
                     id="api-key"
                     type="text"
                     value={apiKey}
-                    onChange={e => onNewApiKey(e.target.value)}
+                    onChange={e => setApiKey(e.target.value)}
                 />
             </div>
             <div className="chat-interface">

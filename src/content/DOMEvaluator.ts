@@ -19,8 +19,12 @@ async function messagesFromReactApp(
 ) {
     console.log(`Received message from React app: ${JSON.stringify(msg)}`);
     if (msg.type == 'execute') {
-        await execute();
+        const result = await execute();
+        sendResponse({ type: 'execute_result', result });
+
+        chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: result });
     }
+    sendResponse({ type: 'ok response' });
 }
 
 chrome.runtime.onMessage.addListener(messagesFromReactApp);

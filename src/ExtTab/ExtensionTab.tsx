@@ -1,40 +1,64 @@
 import React, { useState } from 'react';
 import { send } from '../ai/openai';
 import './ExtensionTab.css';
+import { Chat, ChatMessage, LLM, LLMMessage, Orquestrator } from '../orquestrator/orquestrator';
+import * as openai from '../ai/openai';
+import { Command, extractCommands, extractMessageToUser } from '../ai/extractCommands';
+import { promptSource } from '../ai/promptSource';
 
 type TChatItem = {
-    type: 'user' | 'system';
+    role: 'user' | 'system';
     message: string;
 };
 
-function sendMessage() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+function sendMessageToUserTab() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentTab = tabs[0];
         chrome.tabs.sendMessage(currentTab.id ?? 0, { type: 'execute' });
     });
 }
 
+const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
+    const llm: LLM = {
+        send: async (messages: LLMMessage[]): Promise<string> => {
+            const result = await openai.send(apiKey, messages);
+            return result.choices[0].message.content ?? "";
+        },
+    };
+
+    const htmlDoc = {
+        setInputValue: (id: string, value: string) => {},
+        openLink: (link: string) => {},
+        clickSubmit: (id: string) => {},
+        selectOption: (id: string, value: string) => {},
+    };
+    
+    const commandExtractor = { extractCommands, extractMessageToUser };
+
+    const orquestrator = new Orquestrator(llm, htmlDoc, chat, promptSource, commandExtractor);
+    return orquestrator;
+};
+
 const ExtensionTab = () => {
     const [apiKey, setApiKey] = useState('');
     const [chatMessage, setChatMessage] = useState('');
     const [chatLog, setChatLog] = useState<TChatItem[]>([]);
+    const [orquestrator, setOrchestator] = useState<Orquestrator | null>(null);
+
+    const onNewApiKey = (apiKey: string) => {
+        const chat = {
+            showMessages: (messages: ChatMessage[]) => {
+                setChatLog(messages);
+            },
+        }
+        setOrchestator(getOrquestrator(apiKey, chat));
+    };
 
     const handleSendMessage = async () => {
-        // sendMessage();
-
         if (!chatMessage) {
             return;
         }
-
-        setChatLog([...chatLog, { type: 'user', message: chatMessage }]);
-
-        const result = await send(apiKey, chatMessage);
-        console.log(JSON.stringify(result));
-        setChatLog([...chatLog, 
-            { type: 'user', message: chatMessage }, 
-            { type: 'system', message: (result.choices[0].message.content ?? "") },
-        ]);
-
+        orquestrator?.userMessageArrived(chatMessage);
         setChatMessage('');
     };
 
@@ -50,7 +74,7 @@ const ExtensionTab = () => {
                     id="api-key"
                     type="text"
                     value={apiKey}
-                    onChange={e => setApiKey(e.target.value)}
+                    onChange={e => onNewApiKey(e.target.value)}
                 />
             </div>
             <div className="chat-interface">

@@ -2,12 +2,12 @@ import { Command } from "../ai/extractCommands";
 import { compact, summarize } from "../html/DOMSummary";
 
 export type LLMMessage = {
-    role: 'system' | 'agent' | 'user';
+    role: 'system' | 'assistant' | 'user';
     message: string;
 };
 
 export interface LLM {
-    send(messages: LLMMessage[]): string;
+    send(messages: LLMMessage[]): Promise<string>;
 }
 
 export interface HTMLDoc {
@@ -38,7 +38,7 @@ export interface CommandExtractor {
 export class Orquestrator {
 
     llmMessagesHistory = [
-        { role: 'agent', message: this.promptSource.getMainSystemPromp() }
+        { role: 'assistant', message: this.promptSource.getMainSystemPromp() }
     ] as LLMMessage[];
 
     userMessagesHistory = [] as ChatMessage[];
@@ -66,7 +66,7 @@ export class Orquestrator {
         const compactSummary = compact(summary);
         this.llmMessagesHistory = [
             ...this.llmMessagesHistory,
-            { role: 'agent', message: `result: ${compactSummary}` },
+            { role: 'assistant', message: `result: ${compactSummary}` },
         ]
 
         this.getAndExecuteCommands();

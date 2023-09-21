@@ -2,28 +2,7 @@ import { JSDOM } from "jsdom";
 import { commandsSeparatorStr, extractCommands, extractMessageToUser,  } from "../ai/extractCommands";
 import { Chat, HTMLDoc, LLM, Orquestrator } from "./orquestrator";
 import { compact, summarize } from "../html/DOMSummary";
-
-const promptSource = {
-    getMainSystemPromp: () => `
-        You are a personal assistant. 
-        You have a set of commands available to interact with a browser. 
-        You can and should ask clarification questions to the user if necessary, via the command user_question.
-        You need to explain your actions, then print the commands between pairs of ${commandsSeparatorStr}.
-        You must ask questions to the user if you don't know any information, and wait for the answers before using more commands. 
-        After the command open_browser, a browser will be always open, and all commands interact with it.
-        You have access to the following commands:
-        1. link: Follows the link with the given path. Params: (path: string)
-        2. button: Clicks in a button. Params: (id: string)
-        3. input: Sets the value of an input. Params (id: string, value: string)
-        4. select: Selects/clicks on a radio, select or checkbox. Params (id: string)
-
-        One example of your output may be:
-        Search for the best 5 chairs under $500
-        ${commandsSeparatorStr}
-        open_url("www.google.com")
-        ${commandsSeparatorStr}
-    `,
-};
+import { promptSource } from "../ai/promptSource";
 
 function summarizeHtml(html: string): string {
     const loginPageDocument = new JSDOM(html).window.document;
@@ -83,7 +62,7 @@ describe("orquestrator", () => {
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
         expect(llmMock.send).nthCalledWith(1, [
-            { role: "agent", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
         ]);
         expect(chatMock.showMessages).nthCalledWith(1, [
@@ -96,10 +75,10 @@ describe("orquestrator", () => {
         // Orquestrator calls LLM, which returned askLoginPasswordLlmMsg
         // Orquestrator asks for login and password to the user
         expect(llmMock.send).nthCalledWith(2, [
-            { role: "agent", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },
-            { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
+            { role: "assistant", message: `result: ${summarizeHtml(loginPageHtml)}` },
         ]);
         expect(chatMock.showMessages).nthCalledWith(2, [
             { role: "user", message: sendReceiptUserMsg },
@@ -114,10 +93,10 @@ describe("orquestrator", () => {
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.setInputValue and htmlDocument.clickSubmit
         expect(llmMock.send).nthCalledWith(3, [
-            { role: "agent", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg }, 
-            { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
+            { role: "assistant", message: `result: ${summarizeHtml(loginPageHtml)}` },
             { role: "system", message: askLoginPasswordLlmMsg }, 
             { role: "user", message: userPassUserMsg },
         ]);
@@ -144,14 +123,14 @@ describe("orquestrator", () => {
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
         expect(llmMock.send).nthCalledWith(4, [
-            { role: "agent", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg }, 
-            { role: "agent", message: `result: ${summarizeHtml(loginPageHtml)}` },
+            { role: "assistant", message: `result: ${summarizeHtml(loginPageHtml)}` },
             { role: "system", message: askLoginPasswordLlmMsg }, 
             { role: "user", message: userPassUserMsg },
             { role: "system", message: fillUserPassLlmMsg },  
-            { role: "agent", message: `result: ${summarizeHtml(initialPageHtml)}` },
+            { role: "assistant", message: `result: ${summarizeHtml(initialPageHtml)}` },
         ]);
         expect(chatMock.showMessages).nthCalledWith(4, [
             { role: "user", message: sendReceiptUserMsg },

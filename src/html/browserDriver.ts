@@ -1,6 +1,6 @@
 import { compact, summarize } from "./DOMSummary";
 
-export async function execute() {
+export function execute() {
     console.log('Executing...');
 
     // const node = document.getElementById("climsMyLogin:j_id503:j_id504:j_id505:j_id506:loginForm:username");

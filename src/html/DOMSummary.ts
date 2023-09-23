@@ -35,13 +35,12 @@ function getImmediateTextContent(node: Element): string | null {
 function printTagsRecursive(node: TSummaryNode) {
     const children = node.children as any[];
     const line = node.line;
-    const key = line.key;
 
     let children_items = children
         .map(printTagsRecursive)
         .filter(Boolean) as any;
     
-    if (children_items.length == 1) {
+    if (children_items.length === 1) {
         children_items = children_items[0]
     }
 
@@ -55,15 +54,15 @@ function printTagsRecursive(node: TSummaryNode) {
         // replace multiple spaces with single space
         value = value.split().join();
         const result = [] as any[];
-        if (value != '') {
+        if (value !== '') {
             result.push(value)
         }
         if (!_.isEmpty(children_items)) {
             result.push(children_items)
         }
-        if (result.length == 0) {
+        if (result.length === 0) {
             return null
-        } else if (result.length == 1) {
+        } else if (result.length === 1) {
             return result[0]
         } else {
             return result
@@ -92,8 +91,6 @@ class HtmlExtraction {
     always_show_tags = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT']);
 
     processTagsRecursive(element: Element): TSummaryNode | TSummaryNode[] {
-        const childNodes = [...element.childNodes];
-        const html = element.innerHTML;
         const children = [] as TSummaryNode[];
         for (const child of element.childNodes) {
             if (this.forbiddenProps.has((child as Element).tagName)) {
@@ -121,7 +118,7 @@ class HtmlExtraction {
         }
         */
 
-        if (element.tagName == 'A') {
+        if (element.tagName === 'A') {
             const input_props = {
                 type: 'link',
                 href: element.getAttribute('href'),
@@ -147,7 +144,7 @@ class HtmlExtraction {
             }, {} as { [key: string]: any });
 
 
-            if (element.getAttribute('type') == 'hidden') {
+            if (element.getAttribute('type') === 'hidden') {
                 return children
             }
 
@@ -180,7 +177,7 @@ class HtmlExtraction {
             return { line, children };
         }
         const new_line = { key: element.nodeName, value: directText };
-        if (text_is_empty && children.length == 0 || children.length == 1) {
+        if ((text_is_empty && children.length === 0) || (children.length === 1)) {
             return children;
         } else {
             return { line: new_line, children };

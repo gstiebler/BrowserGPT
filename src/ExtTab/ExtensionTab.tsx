@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ExtensionTab.css';
 import { Chat, ChatMessage, LLM, LLMMessage, Orquestrator } from '../orquestrator/orquestrator';
 import * as openai from '../ai/openai';
-import { Command, extractCommands, extractMessageToUser } from '../ai/extractCommands';
+import { extractCommands, extractMessageToUser } from '../ai/extractCommands';
 import { promptSource } from '../ai/promptSource';
 
 type TChatItem = {
@@ -64,7 +64,7 @@ const ExtensionTab = () => {
         const orquestrator = getOrquestrator(apiKey, chat);
 
         chrome.runtime.onMessage.addListener((msg: any) => {
-            if (msg.type == 'htmlDocumentChanged') {
+            if (msg.type === 'htmlDocumentChanged') {
                 orquestrator.htmlDocumentChanged(msg.compactHtml);
             }
         });
@@ -98,7 +98,7 @@ const ExtensionTab = () => {
             <div className="chat-interface">
                 <div className="chat-log">
                     {chatLog.map((entry, index) => (
-                        <p key={index} className={entry.type}>
+                        <p key={index} className={entry.role}>
                             {entry.message}
                         </p>
                     ))}

@@ -19,10 +19,9 @@ async function messagesFromReactApp(
 ) {
     console.log(`Received message from React app: ${JSON.stringify(msg)}`);
     if (msg.type == 'execute') {
-        const result = await execute();
-        sendResponse({ type: 'execute_result', result });
-
+        const result = execute();
         chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: result });
+        sendResponse({ type: 'execute_result', result });
     }
     sendResponse({ type: 'ok response' });
 }
@@ -44,4 +43,6 @@ chrome.runtime.onMessage.addListener(
 
 window.onload = function () {
     console.log("All resources finished loading!");
+    const result = execute();
+    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: result });
 };

@@ -38,9 +38,6 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
         clickSubmit: (id: string) => {
             sendMessageToUserTab({ command: 'clickSubmit', id });
         },
-        selectOption: (id: string, value: string) => {
-            sendMessageToUserTab({ command: 'selectOption', id, value });
-        },
     };
     
     const commandExtractor = { extractCommands, extractMessageToUser };

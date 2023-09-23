@@ -1,4 +1,5 @@
-import { execute } from '../html/browserDriver';
+import _ from 'lodash';
+import { clickButton, getSummarizedHtmlFromDocument, openLink, setInputValue } from '../html/browserDriver';
 
 const button = new DOMParser().parseFromString(
     '<button>Click to open side panel</button>',
@@ -12,37 +13,32 @@ button.addEventListener('click', function () {
 });
 document.body.append(button);
 
-async function messagesFromReactApp(
+function executeCommand(msg: any) {
+    if (msg.command === 'openLink') {
+        return openLink(msg.link);
+    } else if (msg.command === 'setInputValue') {
+        return setInputValue(msg.id, msg.value);
+    } else if (msg.command === 'clickSubmit') {
+        return clickButton(msg.id);
+    }
+}
+
+function messagesFromReactApp(
     msg: any,
     sender: chrome.runtime.MessageSender,
     sendResponse: (response: any) => void
 ) {
     console.log(`Received message from React app: ${JSON.stringify(msg)}`);
-    if (msg.type == 'execute') {
-        const result = execute();
-        chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: result });
-        sendResponse({ type: 'execute_result', result });
+    const result = executeCommand(msg);
+    if (!_.isEmpty(result)) {
+        sendResponse({ type: 'ok response', result });
     }
-    sendResponse({ type: 'ok response' });
 }
 
 chrome.runtime.onMessage.addListener(messagesFromReactApp);
 
-export function fun() { }
-
-
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-        console.log(sender.tab ?
-            "from a content script:" + sender.tab.url :
-            "from the extension");
-        if (request.greeting === "hello")
-            sendResponse({ farewell: "goodbye" });
-    }
-);
-
 window.onload = function () {
     console.log("All resources finished loading!");
-    const result = execute();
+    const result = getSummarizedHtmlFromDocument();
     chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: result });
 };

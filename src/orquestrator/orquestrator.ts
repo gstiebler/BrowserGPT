@@ -14,7 +14,6 @@ export interface HTMLDoc {
     setInputValue(id: string, value: string): void;
     openLink(link: string): void;
     clickSubmit(id: string): void;
-    selectOption(id: string, value: string): void;
 }
 
 export type ChatMessage = {
@@ -91,7 +90,6 @@ export class Orquestrator {
                 'set_input_value': this.htmlDocument.setInputValue,
                 'open_link': this.htmlDocument.openLink,
                 'click_submit': this.htmlDocument.clickSubmit,
-                'select_option': this.htmlDocument.selectOption,
             } as { [key: string]: Function };
             
             const commandFn = commandsFunctions[command.name];

@@ -23,7 +23,6 @@ describe("orquestrator", () => {
             setInputValue: jest.fn(),
             openLink: jest.fn(),
             clickSubmit: jest.fn(),
-            selectOption: jest.fn(),
         };
         chatMock = { showMessages: jest.fn() };
     });

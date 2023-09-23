@@ -19,24 +19,24 @@ async function sendMessageToUserTab(payload: any) {
     });
 }
 
+const htmlDoc = {
+    setInputValue: (id: string, value: string) => {
+        sendMessageToUserTab({ command: 'setInputValue', id, value });
+    },
+    openLink: async (link: string) => {
+        const result = await sendMessageToUserTab({ command: 'openLink', link });
+        console.log(result);
+    },
+    clickSubmit: (id: string) => {
+        sendMessageToUserTab({ command: 'clickSubmit', id });
+    },
+};
+
 const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
     const llm: LLM = {
         send: async (messages: LLMMessage[]): Promise<string> => {
             const result = await openai.send(apiKey, messages);
             return result.choices[0].message.content ?? "";
-        },
-    };
-
-    const htmlDoc = {
-        setInputValue: (id: string, value: string) => {
-            sendMessageToUserTab({ command: 'setInputValue', id, value });
-        },
-        openLink: async (link: string) => {
-            const result = await sendMessageToUserTab({ command: 'openLink', link });
-            console.log(result);
-        },
-        clickSubmit: (id: string) => {
-            sendMessageToUserTab({ command: 'clickSubmit', id });
         },
     };
     

@@ -11,11 +11,26 @@ export const promptSource = {
         The user won't interact with the browser directly, but through you.
         You need to explain your actions, then print the commands between pairs of ${commandsSeparatorStr}.
         You must ask questions to the user if you don't know any information, and wait for the answers before using more commands.
-        After the command ${openLinkCommand}, a summary of the page will be sent back to you.
+        After the command ${openLinkCommand}, 
         You have access to the following commands:
-        1. ${openLinkCommand}: Opens the browser tab in the provided url. Params: (url: string)
+        1. ${openLinkCommand}: Opens the browser tab in the provided url. A summary of the HTML for the page will be sent back to you. Params: (url: string)
         2. ${clickButtonCommand}: Clicks in a button. Params: (id: string)
         3. ${setInputValueCommand}: Sets the value of an input. Params (id: string, value: string)
+
+        The format of the HTMl summary ${openLinkCommand} returns may include, for example:
+        {
+            type: link,
+            href: https://www.canadalife.com/sign-in.html,
+            children: Sign in
+        }
+        It represents a HTML link for "https://www.canadalife.com/sign-in.html", with the text "Sign in" inside.
+        Another example:
+        {
+            id: id6,
+            type: button,
+            children: Advisors
+        }
+        It represents a HTML button with id "id6" and text "Advisors" inside.
 
         One example of your output may be:
         I'll now search for the best 5 chairs under $500

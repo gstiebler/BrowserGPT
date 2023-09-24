@@ -8,9 +8,9 @@ import ExtensionMainTab from './ExtensionMainTab';
 
 
 async function sendMessageToUserTab(payload: any) {
-    return chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    return chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
         const currentTab = tabs[0];
-        const result = chrome.tabs.sendMessage(currentTab.id ?? 0, payload);
+        const result = await chrome.tabs.sendMessage(currentTab.id ?? 0, payload);
         console.log(result);
         return result;
     });
@@ -54,7 +54,6 @@ const ExtensionTab: React.FC = () => {
         const chat = {
             showMessages: (messages: ChatMessage[]) => {
                 setChatLog(messages);
-                console.log(`showMessages: ${JSON.stringify(messages)}`);
             },
         }
         const orquestrator = getOrquestrator(apiKey, chat);

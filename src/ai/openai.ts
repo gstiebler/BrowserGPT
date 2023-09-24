@@ -10,13 +10,16 @@ export async function send(apiKey: string, messagesLlm: LLMMessage[]): Promise<O
         content: message.message,
     }));
 
+    const gpt4Model = "gpt-4-0613";
+    const gpt3Model = "gpt-3.5-turbo-0613";
+
     let retryCount = 0;
     const maxRetries = 3; // Set maximum number of retries
 
     while (true) {
         try {
             const response = await openai.chat.completions.create({
-                model: "gpt-4-0613",
+                model: gpt3Model,
                 messages,
                 temperature: 1,
                 max_tokens: 256,

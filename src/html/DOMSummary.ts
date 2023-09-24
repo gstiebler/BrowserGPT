@@ -12,6 +12,10 @@ type TSummaryNode = {
 
 export function summarize(document: Document) {
     const extractor = new HtmlExtraction();
+    if (_.isEmpty(document.body)) {
+        console.error('Document body is empty');
+        return null;
+    }
     const result = extractor.processTagsRecursive(document.body) as TSummaryNode;
     const toPrint = result instanceof Array ? result[0] : result;
     const summary = printTagsRecursive(toPrint);

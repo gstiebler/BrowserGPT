@@ -94,8 +94,11 @@ export class Orquestrator {
                 'open_link': this.htmlDocument.openLink,
                 'click_submit': this.htmlDocument.clickSubmit,
             } as { [key: string]: Function };
-            
             const commandFn = commandsFunctions[command.name];
+            if (!commandFn) {
+                console.error(`Command ${command.name} not found`);
+                continue;
+            }
             commandFn(...command.params);
         }
     }

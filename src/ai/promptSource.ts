@@ -6,7 +6,7 @@ export const promptSource = {
         You have a set of commands available to interact with a browser.
         You need to explain your actions, then print the commands between pairs of ${commandsSeparatorStr}.
         You must ask questions to the user if you don't know any information, and wait for the answers before using more commands. 
-        After the command open_browser, a browser will be always open, and all commands interact with it.
+        After the command open_link, a summary of the page will be sent back to you.
         You have access to the following commands:
         1. open_link: Follows the link with the given path. Params: (path: string)
         2. button: Clicks in a button. Params: (id: string)

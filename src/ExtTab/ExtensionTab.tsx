@@ -30,8 +30,10 @@ const htmlDoc = {
 };
 
 const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
+    console.log(`getOrquestrator with apiKey: ${apiKey}`);
     const llm: LLM = {
         send: async (messages: LLMMessage[]): Promise<string> => {
+            console.log(`apiKey in send: ${apiKey}`);
             const result = await openai.send(apiKey, messages);
             return result.choices[0].message.content ?? "";
 

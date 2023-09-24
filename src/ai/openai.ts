@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat";
 import { LLMMessage } from "../orquestrator/orquestrator";
 import { backOff } from "exponential-backoff";
+import _ from "lodash";
 
 
 async function sendInternal(apiKey: string, messagesLlm: LLMMessage[]): Promise<OpenAI.Chat.Completions.ChatCompletion> {
@@ -27,6 +28,9 @@ async function sendInternal(apiKey: string, messagesLlm: LLMMessage[]): Promise<
 }
 
 export function send(apiKey: string, messagesLlm: LLMMessage[]): Promise<OpenAI.Chat.Completions.ChatCompletion> {
+    if (_.isEmpty(apiKey)) {
+        throw new Error('No OpenAI API key provided: ' + apiKey);
+    }
     return backOff(() => sendInternal(apiKey, messagesLlm),
         { retry: (e: any, attempNumber: number) => { console.log(`Error sending message to OpenAI: ${e}`); return true; } }
     );

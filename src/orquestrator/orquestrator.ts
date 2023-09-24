@@ -70,7 +70,8 @@ export class Orquestrator {
     }
 
     private async getAndExecuteCommands() {
-        console.log(`Sending the following messages to LLM: ${JSON.stringify(this.llmMessagesHistory)}`);
+        console.log('Sending the following messages to LLM:');
+        console.log(this.llmMessagesHistory);
         const result1 = await this.llm.send(this.llmMessagesHistory);
         console.log(`Received the following message from LLM: ${result1}`);
         this.llmMessagesHistory = [

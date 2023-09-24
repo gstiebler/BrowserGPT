@@ -1,8 +1,9 @@
 import { compact, summarize } from "./DOMSummary";
 
 export function getSummarizedHtmlFromDocument() {
-    console.log('Executing...');
     const summary = summarize(document);
+    console.log('Summary without compaction');
+    console.log(summary);
     const compactSummary = compact(summary);
     return compactSummary;
 }

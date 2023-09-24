@@ -81,7 +81,7 @@ export class Orquestrator {
         ]
         const commands = this.commandExtractor.extractCommands(result1);
         const msgToUser = this.commandExtractor.extractMessageToUser(result1);
-        this.userMessagesHistory.push({ role: 'system', message: msgToUser });
+        this.userMessagesHistory = [...this.userMessagesHistory, { role: 'system', message: msgToUser }];
         this.chat.showMessages(this.userMessagesHistory);
         this.executeCommands(commands);
     }

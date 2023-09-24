@@ -22,9 +22,6 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
     return (
         <Container maxWidth="md">
             <Paper elevation={3} style={{ padding: '20px' }}>
-                <Typography variant="h5">Welcome to the Futuristic Interface.</Typography>
-                <Typography variant="body1">Experience the next generation of UI.</Typography>
-
                 <div style={{ margin: '20px 0' }}>
                     <TextField
                         label="API Key"

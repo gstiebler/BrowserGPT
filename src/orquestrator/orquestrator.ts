@@ -1,6 +1,5 @@
 import { Command } from "../ai/extractCommands";
 import { clickButtonCommand, openLinkCommand, setInputValueCommand } from "../ai/promptSource";
-import { compact, summarize } from "../html/DOMSummary";
 
 export type LLMMessage = {
     role: 'system' | 'assistant' | 'user';
@@ -61,12 +60,10 @@ export class Orquestrator {
         await this.getAndExecuteCommands();
     }
 
-    async htmlDocumentChanged(document: Document) {
-        const summary = summarize(document);
-        const compactSummary = compact(summary);
+    async htmlDocumentChanged(compactHtmlSummary: string) {
         this.llmMessagesHistory = [
             ...this.llmMessagesHistory,
-            { role: 'assistant', message: `result: ${compactSummary}` },
+            { role: 'assistant', message: `result: ${compactHtmlSummary}` },
         ]
 
         this.getAndExecuteCommands();

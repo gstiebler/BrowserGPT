@@ -70,14 +70,15 @@ describe("orquestrator", () => {
         ]);
         expect(htmlDocumentMock.openLink).nthCalledWith(1, "www.canadalife.com");
 
-        await orquestrator.htmlDocumentChanged(new JSDOM(loginPageHtml).window.document);
+        const loginPageSummary = summarizeHtml(loginPageHtml);
+        await orquestrator.htmlDocumentChanged(loginPageSummary);
         // Orquestrator calls LLM, which returned askLoginPasswordLlmMsg
         // Orquestrator asks for login and password to the user
         expect(llmMock.send).nthCalledWith(2, [
             { role: "assistant", message: promptSource.getMainSystemPromp() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },
-            { role: "assistant", message: `result: ${summarizeHtml(loginPageHtml)}` },
+            { role: "assistant", message: `result: ${loginPageSummary}` },
         ]);
         expect(chatMock.showMessages).nthCalledWith(2, [
             { role: "user", message: sendReceiptUserMsg },
@@ -117,7 +118,9 @@ describe("orquestrator", () => {
                 </body>
             </html>
         `;
-        await orquestrator.htmlDocumentChanged(new JSDOM(initialPageHtml).window.document);
+
+        const initialPageSummary = summarizeHtml(initialPageHtml);
+        await orquestrator.htmlDocumentChanged(initialPageSummary);
         // Orquestrator calls LLM, which returned open_link(/make_a_claim)
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
@@ -129,7 +132,7 @@ describe("orquestrator", () => {
             { role: "system", message: askLoginPasswordLlmMsg }, 
             { role: "user", message: userPassUserMsg },
             { role: "system", message: fillUserPassLlmMsg },  
-            { role: "assistant", message: `result: ${summarizeHtml(initialPageHtml)}` },
+            { role: "assistant", message: `result: ${initialPageSummary}` },
         ]);
         expect(chatMock.showMessages).nthCalledWith(4, [
             { role: "user", message: sendReceiptUserMsg },

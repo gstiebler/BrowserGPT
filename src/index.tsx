@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import App from './ExtTab/ExtensionTab';
 import reportWebVitals from './reportWebVitals';
+import { GlobalStyles } from '@mui/material';
 
 const darkTheme = createTheme({
 });
@@ -13,6 +14,12 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <ThemeProvider theme={darkTheme}>
+    <GlobalStyles styles={{
+      'html, body, #root': {
+        height: '100%',
+        margin: 5,
+      },
+    }} />
     <CssBaseline />
       <React.StrictMode>
           <App />

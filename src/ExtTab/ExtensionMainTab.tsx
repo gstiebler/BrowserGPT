@@ -20,8 +20,8 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
     handleSendMessage,
 }) => {
     return (
-        <Container maxWidth="md">
-            <Paper elevation={3} style={{ padding: '20px' }}>
+        <Container maxWidth="md" style={{ height: '100%' }}>
+            <Paper elevation={3} style={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ margin: '20px 0' }}>
                     <TextField
                         label="API Key"
@@ -32,9 +32,9 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                     />
                 </div>
 
-                <div style={{ margin: '20px 0' }}>
+                <div style={{ margin: '20px 0', flexGrow: 1 }}>
                     <Typography variant="body1">Chat Log</Typography>
-                    <Paper elevation={1} style={{ padding: '10px', height: '400px', overflow: 'auto' }}>  {/* Increased height */}
+                    <Paper elevation={1} style={{ padding: '10px', height: '100%', overflow: 'auto' }}>
                         {chatLog.map((entry, index) => (
                             <div key={index} style={{
                                 margin: '10px 0',

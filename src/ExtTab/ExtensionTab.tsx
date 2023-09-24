@@ -34,6 +34,7 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
         send: async (messages: LLMMessage[]): Promise<string> => {
             const result = await openai.send(apiKey, messages);
             return result.choices[0].message.content ?? "";
+
         },
     };
     
@@ -53,6 +54,7 @@ const ExtensionTab: React.FC = () => {
         const chat = {
             showMessages: (messages: ChatMessage[]) => {
                 setChatLog(messages);
+                console.log(`showMessages: ${JSON.stringify(messages)}`);
             },
         }
         const orquestrator = getOrquestrator(apiKey, chat);

@@ -88,6 +88,7 @@ export class Orquestrator {
 
     private async executeCommands(commands: Command[]) {
         for (const command of commands) {
+            console.log(`command: ${JSON.stringify(command)}`);
             const commandsFunctions = {
                 'set_input_value': this.htmlDocument.setInputValue,
                 'open_link': this.htmlDocument.openLink,

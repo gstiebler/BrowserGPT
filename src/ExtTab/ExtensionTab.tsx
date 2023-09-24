@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './ExtensionTab.css';
 import { Chat, ChatMessage, LLM, LLMMessage, Orquestrator } from '../orquestrator/orquestrator';
 import * as openai from '../ai/openai';
 import { extractCommands, extractMessageToUser } from '../ai/extractCommands';
 import { promptSource } from '../ai/promptSource';
+import { TChatItem } from './types';
+import ExtensionMainTab from './ExtensionMainTab';
 
-type TChatItem = {
-    role: 'user' | 'system';
-    message: string;
-};
 
 async function sendMessageToUserTab(payload: any) {
     return chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -46,7 +43,7 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
     return orquestrator;
 };
 
-const ExtensionTab = () => {
+const ExtensionTab: React.FC = () => {
     const [apiKey, setApiKey] = useState('');
     const [chatMessage, setChatMessage] = useState('');
     const [chatLog, setChatLog] = useState<TChatItem[]>([]);
@@ -78,39 +75,14 @@ const ExtensionTab = () => {
     };
 
     return (
-        <div className="futuristic-container">
-            <div className="intro-text">
-                <p>Welcome to the Futuristic Interface.</p>
-                <p>Experience the next generation of UI.</p>
-            </div>
-            <div className="api-key-container">
-                <label htmlFor="api-key">API key</label>
-                <input
-                    id="api-key"
-                    type="text"
-                    value={apiKey}
-                    onChange={e => setApiKey(e.target.value)}
-                />
-            </div>
-            <div className="chat-interface">
-                <div className="chat-log">
-                    {chatLog.map((entry, index) => (
-                        <p key={index} className={entry.role}>
-                            {entry.message}
-                        </p>
-                    ))}
-                </div>
-                <div className="chat-input">
-                    <input
-                        type="text"
-                        value={chatMessage}
-                        onChange={e => setChatMessage(e.target.value)}
-                        placeholder="Type a message..."
-                    />
-                    <button onClick={handleSendMessage}>Send</button>
-                </div>
-            </div>
-        </div>
+        <ExtensionMainTab
+          apiKey={apiKey}
+          setApiKey={setApiKey}
+          chatLog={chatLog}
+          chatMessage={chatMessage}
+          setChatMessage={setChatMessage}
+          handleSendMessage={handleSendMessage}
+        />
     );
 };
 

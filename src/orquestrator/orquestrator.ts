@@ -57,7 +57,7 @@ export class Orquestrator {
         ]
         this.userMessagesHistory.push({ role: 'user', message: userMessage });
         this.chat.showMessages(this.userMessagesHistory);
-        this.getAndExecuteCommands();
+        await this.getAndExecuteCommands();
     }
 
     async htmlDocumentChanged(document: Document) {

@@ -6,9 +6,6 @@ import App from './ExtTab/ExtensionTab';
 import reportWebVitals from './reportWebVitals';
 
 const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
 });
 
 const root = ReactDOM.createRoot(

@@ -57,7 +57,7 @@ const ExtensionTab: React.FC = () => {
         }
         const orquestrator = getOrquestrator(apiKey, chat);
 
-        chrome.runtime.onMessage.addListener((msg: any) => {
+        chrome.runtime?.onMessage.addListener((msg: any) => {
             if (msg.type === 'htmlDocumentChanged') {
                 orquestrator.htmlDocumentChanged(msg.compactHtml);
             }

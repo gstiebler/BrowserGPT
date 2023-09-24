@@ -4,7 +4,6 @@ export function getSummarizedHtmlFromDocument() {
     console.log('Executing...');
     const summary = summarize(document);
     const compactSummary = compact(summary);
-    console.log(JSON.stringify(summary, null, 2));
     return compactSummary;
 }
 

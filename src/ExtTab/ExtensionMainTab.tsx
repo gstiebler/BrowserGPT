@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, Button, Typography, Container, Paper } from '@mui/material';
+import { TextField, Button, Typography, Container, Paper, Avatar } from '@mui/material';
 import { TChatItem } from './types';
 
 interface ExtensionMainTabProps {
@@ -34,11 +34,19 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
 
                 <div style={{ margin: '20px 0' }}>
                     <Typography variant="body1">Chat Log</Typography>
-                    <Paper elevation={1} style={{ padding: '10px', height: '200px', overflow: 'auto' }}>
+                    <Paper elevation={1} style={{ padding: '10px', height: '400px', overflow: 'auto' }}>  {/* Increased height */}
                         {chatLog.map((entry, index) => (
-                            <Typography key={index} variant="body2" style={{ textAlign: entry.role === 'user' ? 'right' : 'left' }}>
-                                {entry.message}
-                            </Typography>
+                            <div key={index} style={{
+                                margin: '10px 0',
+                                padding: '10px',
+                                backgroundColor: entry.role === 'user' ? '#e6f7ff' : '#f2f2f2',
+                                textAlign: entry.role === 'user' ? 'right' : 'left'
+                            }}>
+                                <Avatar>{entry.role === 'user' ? 'U' : 'S'}</Avatar>
+                                <Typography variant="body2">
+                                    {entry.message}
+                                </Typography>
+                            </div>
                         ))}
                     </Paper>
                 </div>
@@ -47,6 +55,8 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                     <TextField
                         label="Type a message..."
                         variant="outlined"
+                        multiline  // Allows multiple lines
+                        rows={4}  // Sets the number of visible rows
                         style={{ flex: 1 }} // Takes up the available space
                         value={chatMessage}
                         onChange={e => setChatMessage(e.target.value)}

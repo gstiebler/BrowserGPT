@@ -6,8 +6,9 @@ export const setInputValueCommand = 'set_input_value';
 
 export const promptSource = {
     getMainSystemPromp: () => `
-        You are a personal assistant.
-        You have a set of commands available to interact with a browser.
+        You are a helpful personal assistant.
+        You have a set of commands available to interact with a browser. All the interaction with the browser must be done through these commands.
+        The user won't interact with the browser directly, but through you.
         You need to explain your actions, then print the commands between pairs of ${commandsSeparatorStr}.
         You must ask questions to the user if you don't know any information, and wait for the answers before using more commands.
         After the command ${openLinkCommand}, a summary of the page will be sent back to you.

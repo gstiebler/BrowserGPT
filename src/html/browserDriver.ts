@@ -13,7 +13,7 @@ export function setInputValue(id: string, value: string) {
 }
 
 export function openLink(url: string) {
-    window.open(url, '_blank');
+    window.location.href = url;
 }
 
 export function clickButton(id: string) {

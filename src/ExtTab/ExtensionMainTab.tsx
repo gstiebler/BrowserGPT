@@ -1,5 +1,5 @@
 import React from 'react';
-import './ExtensionTab.css';
+import { TextField, Button, Typography, Container, Paper } from '@mui/material';
 import { TChatItem } from './types';
 
 interface ExtensionMainTabProps {
@@ -12,48 +12,55 @@ interface ExtensionMainTabProps {
 }
 
 const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
-    apiKey, 
+    apiKey,
     setApiKey,
     chatLog,
     chatMessage,
     setChatMessage,
     handleSendMessage,
-}) => {
+  }) => {
     return (
-        <div className="futuristic-container">
-            <div className="intro-text">
-                <p>Welcome to the Futuristic Interface.</p>
-                <p>Experience the next generation of UI.</p>
-            </div>
-            <div className="api-key-container">
-                <label htmlFor="api-key">API key</label>
-                <input
-                    id="api-key"
-                    type="text"
-                    value={apiKey}
-                    onChange={e => setApiKey(e.target.value)}
-                />
-            </div>
-            <div className="chat-interface">
-                <div className="chat-log">
-                    {chatLog.map((entry, index) => (
-                        <p key={index} className={entry.role}>
-                            {entry.message}
-                        </p>
-                    ))}
-                </div>
-                <div className="chat-input">
-                    <input
-                        type="text"
-                        value={chatMessage}
-                        onChange={e => setChatMessage(e.target.value)}
-                        placeholder="Type a message..."
-                    />
-                    <button onClick={handleSendMessage}>Send</button>
-                </div>
-            </div>
-        </div>
+      <Container maxWidth="md">
+        <Paper elevation={3} style={{ padding: '20px' }}>
+          <Typography variant="h5">Welcome to the Futuristic Interface.</Typography>
+          <Typography variant="body1">Experience the next generation of UI.</Typography>
+          
+          <div style={{ margin: '20px 0' }}>
+            <TextField
+              label="API Key"
+              variant="outlined"
+              fullWidth
+              value={apiKey}
+              onChange={e => setApiKey(e.target.value)}
+            />
+          </div>
+          
+          <div style={{ margin: '20px 0' }}>
+            <Typography variant="body1">Chat Log</Typography>
+            <Paper elevation={1} style={{ padding: '10px', height: '200px', overflow: 'auto' }}>
+              {chatLog.map((entry, index) => (
+                <Typography key={index} variant="body2" style={{ textAlign: entry.role === 'user' ? 'right' : 'left' }}>
+                  {entry.message}
+                </Typography>
+              ))}
+            </Paper>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <TextField
+              label="Type a message..."
+              variant="outlined"
+              fullWidth
+              value={chatMessage}
+              onChange={e => setChatMessage(e.target.value)}
+            />
+            <Button variant="contained" color="primary" onClick={handleSendMessage}>
+              Send
+            </Button>
+          </div>
+        </Paper>
+      </Container>
     );
-}
+  };
 
 export default ExtensionMainTab;

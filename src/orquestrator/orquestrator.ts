@@ -1,4 +1,5 @@
 import { Command } from "../ai/extractCommands";
+import { clickButtonCommand, openLinkCommand, setInputValueCommand } from "../ai/promptSource";
 import { compact, summarize } from "../html/DOMSummary";
 
 export type LLMMessage = {
@@ -90,9 +91,9 @@ export class Orquestrator {
         for (const command of commands) {
             console.log(`command: ${JSON.stringify(command)}`);
             const commandsFunctions = {
-                'set_input_value': this.htmlDocument.setInputValue,
-                'open_link': this.htmlDocument.openLink,
-                'click_submit': this.htmlDocument.clickSubmit,
+                [setInputValueCommand]: this.htmlDocument.setInputValue,
+                [openLinkCommand]: this.htmlDocument.openLink,
+                [clickButtonCommand]: this.htmlDocument.clickSubmit,
             } as { [key: string]: Function };
             const commandFn = commandsFunctions[command.name];
             if (!commandFn) {

@@ -26,7 +26,7 @@ export interface Chat {
 }
 
 export interface PromptSource {
-    getMainSystemPromp(): string;
+    getMainSystemPrompt(): string;
 }
 
 export interface CommandExtractor {
@@ -37,7 +37,7 @@ export interface CommandExtractor {
 export class Orquestrator {
 
     llmMessagesHistory = [
-        { role: 'assistant', message: this.promptSource.getMainSystemPromp() }
+        { role: 'assistant', message: this.promptSource.getMainSystemPrompt() }
     ] as LLMMessage[];
 
     userMessagesHistory = [] as ChatMessage[];

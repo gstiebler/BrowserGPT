@@ -61,7 +61,7 @@ describe("orquestrator", () => {
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
         expect(llmMock.send).nthCalledWith(1, [
-            { role: "assistant", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPrompt() },
             { role: "user", message: sendReceiptUserMsg },
         ]);
         expect(chatMock.showMessages).nthCalledWith(1, [
@@ -75,7 +75,7 @@ describe("orquestrator", () => {
         // Orquestrator calls LLM, which returned askLoginPasswordLlmMsg
         // Orquestrator asks for login and password to the user
         expect(llmMock.send).nthCalledWith(2, [
-            { role: "assistant", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPrompt() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg },
             { role: "assistant", message: `result: ${loginPageSummary}` },
@@ -93,7 +93,7 @@ describe("orquestrator", () => {
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.setInputValue and htmlDocument.clickSubmit
         expect(llmMock.send).nthCalledWith(3, [
-            { role: "assistant", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPrompt() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg }, 
             { role: "assistant", message: `result: ${summarizeHtml(loginPageHtml)}` },
@@ -125,7 +125,7 @@ describe("orquestrator", () => {
         // Orquestrator shows the new LLM message to the user
         // Orquestrator calls htmlDocument.openLink
         expect(llmMock.send).nthCalledWith(4, [
-            { role: "assistant", message: promptSource.getMainSystemPromp() },
+            { role: "assistant", message: promptSource.getMainSystemPrompt() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "system", message: openLinkLlmMsg }, 
             { role: "assistant", message: `result: ${summarizeHtml(loginPageHtml)}` },

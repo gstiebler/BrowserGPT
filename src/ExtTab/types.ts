@@ -1,6 +1,6 @@
 
 
 export type TChatItem = {
-    role: 'user' | 'system';
+    role: 'user' | 'assistant';
     message: string;
 };

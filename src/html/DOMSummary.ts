@@ -109,17 +109,6 @@ class HtmlExtraction {
 
         const directText = getImmediateTextContent(element)?.trim()
         const text_is_empty = _.isEmpty(directText);
-        
-        /*
-        if (element.getAttribute) {
-            const attrs = element.getAttributeNames();
-            const attrMap = attrs.reduce((acc, name) => {
-                acc[name] = element.getAttribute(name);
-                return acc;
-            }, {} as { [key: string]: any });
-            console.log(attrMap);
-        }
-        */
 
         if (element.tagName === 'A') {
             const input_props = {
@@ -133,9 +122,6 @@ class HtmlExtraction {
             const line: TLine = { key: 'link', value: input_props };
             return { line, children };
         }
-        // define a type with key as string, value as any
-
-
         if (this.always_show_tags.has(element.tagName)) {
             // filter input attributes to only show the ones we want
             const attributeNames = element.getAttributeNames();

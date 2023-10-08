@@ -17,7 +17,7 @@ export interface HTMLDoc {
 }
 
 export type ChatMessage = {
-    role: 'system' | 'user';
+    role: 'assistant' | 'user';
     message: string;
 };
 
@@ -76,11 +76,11 @@ export class Orquestrator {
         console.log(`Received the following message from LLM: ${result1}`);
         this.llmMessagesHistory = [
             ...this.llmMessagesHistory,
-            { role: 'system', message: result1 },
+            { role: 'assistant', message: result1 },
         ]
         const commands = this.commandExtractor.extractCommands(result1);
         const msgToUser = this.commandExtractor.extractMessageToUser(result1);
-        this.userMessagesHistory = [...this.userMessagesHistory, { role: 'system', message: msgToUser }];
+        this.userMessagesHistory = [...this.userMessagesHistory, { role: 'assistant', message: msgToUser }];
         this.chat.showMessages(this.userMessagesHistory);
         this.executeCommands(commands);
     }

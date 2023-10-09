@@ -26,7 +26,10 @@ const messagesLlm = [
 async function execute() {
     const OPENAI_KEY = process.env.OPENAI_KEY as string;
     const result = await send(OPENAI_KEY, messagesLlm);
+    console.log(result.choices[0].message);
     return result.choices[0].message;
 }
+
+execute();
 
 export default execute;

@@ -2,6 +2,7 @@
   "name": "react-chrome-extension",
   "version": "0.1.0",
   "private": true,
+  "type": "commonjs",
   "dependencies": {
     "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.1",
@@ -23,6 +24,7 @@
     "start": "react-scripts start",
     "build": "INLINE_RUNTIME_CHUNK=false craco build",
     "test": "react-scripts test",
+    "prompt_test": "tsc && node dist/dev/promptTest.js",
     "eject": "react-scripts eject"
   },
   "setupFiles": [

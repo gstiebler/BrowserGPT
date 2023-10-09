@@ -1,3 +1,5 @@
+[![Node CI](https://github.com/gstiebler/GuiGPTChromeExt/actions/workflows/webpack.yml/badge.svg)](https://github.com/gstiebler/GuiGPTChromeExt/actions/workflows/webpack.yml)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

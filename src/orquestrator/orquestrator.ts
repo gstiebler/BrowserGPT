@@ -37,7 +37,7 @@ export interface CommandExtractor {
 export class Orquestrator {
 
     llmMessagesHistory = [
-        { role: 'assistant', message: this.promptSource.getMainSystemPrompt() }
+        { role: 'system', message: this.promptSource.getMainSystemPrompt() }
     ] as LLMMessage[];
 
     userMessagesHistory = [] as ChatMessage[];
@@ -63,7 +63,7 @@ export class Orquestrator {
     async htmlDocumentChanged(compactHtmlSummary: string) {
         this.llmMessagesHistory = [
             ...this.llmMessagesHistory,
-            { role: 'assistant', message: `result: ${compactHtmlSummary}` },
+            { role: 'system', message: `result: ${compactHtmlSummary}` },
         ]
 
         this.getAndExecuteCommands();

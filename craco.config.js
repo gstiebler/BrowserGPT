@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
     webpack: {
         configure: (webpackConfig, {env, paths}) => {
@@ -17,5 +19,15 @@ module.exports = {
                 }
             }
         },
+        plugins: {
+          add: [
+            new webpack.DefinePlugin({
+                'process.env.OPENAI_KEY': JSON.stringify(process.env.OPENAI_KEY),
+            }),
+            new webpack.DefinePlugin({
+                'process.env.INITIAL_MESSAGE': JSON.stringify(process.env.INITIAL_MESSAGE),
+            }),
+          ], 
+        }
     }
  }

@@ -47,8 +47,8 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
 };
 
 const ExtensionTab: React.FC = () => {
-    const [apiKey, setApiKey] = useState('');
-    const [chatMessage, setChatMessage] = useState('');
+    const [apiKey, setApiKey] = useState(process.env.OPENAI_KEY ?? '');
+    const [chatMessage, setChatMessage] = useState(process.env.INITIAL_MESSAGE ?? '');
     const [chatLog, setChatLog] = useState<TChatItem[]>([]);
     const [orquestrator, setOrchestator] = useState<Orquestrator | null>(null);
 

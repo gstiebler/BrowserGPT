@@ -14,7 +14,7 @@ describe("extract command", () => {
         const result = extractCommands(aiMessage);
         expect(result).toEqual([
             { name: 'command1', params: [] },
-            { name: 'command2', params: ['param1, param2'] },
+            { name: 'command2', params: ['param1', 'param2'] },
         ]);
     });
 });

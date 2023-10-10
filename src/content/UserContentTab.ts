@@ -1,17 +1,8 @@
 import _ from 'lodash';
 import { clickButton, getSummarizedHtmlFromDocument, openLink, setInputValue } from '../html/browserDriver';
 
-const button = new DOMParser().parseFromString(
-    '<button>Click to open side panel</button>',
-    'text/html'
-).body.firstElementChild!;
 
 console.log('Yes, it opened');
-
-button.addEventListener('click', function () {
-    chrome.runtime.sendMessage({ type: 'open_side_panel' });
-});
-document.body.append(button);
 
 function executeCommand(msg: any) {
     if (msg.command === 'openLink') {

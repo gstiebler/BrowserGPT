@@ -18,7 +18,6 @@ chrome.runtime.onInstalled.addListener(() => {
     title: 'Open side panel',
     contexts: ['all']
   });
-  chrome.tabs.create({ url: 'page.html' });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {

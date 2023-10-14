@@ -43,8 +43,8 @@ export class Orquestrator {
     userMessagesHistory = [] as ChatMessage[];
 
     constructor(
-        private llm: LLM, 
-        private htmlDocument: HTMLDoc, 
+        private llm: LLM,
+        private htmlDocument: HTMLDoc,
         private chat: Chat,
         private promptSource: PromptSource,
         private commandExtractor: CommandExtractor
@@ -60,10 +60,17 @@ export class Orquestrator {
         await this.getAndExecuteCommands();
     }
 
+    private summarizeHTMlMessageFromHistory() {
+        const maxHtmlLength = 3000;
+        this.llmMessagesHistory = this.llmMessagesHistory
+            .map(msg => msg.message.length > maxHtmlLength ? { ...msg, message: 'The HTML summary was removed to reduce the length of the message' } : msg);
+    }
+
     async htmlDocumentChanged(compactHtmlSummary: string) {
+        this.summarizeHTMlMessageFromHistory();
         this.llmMessagesHistory = [
             ...this.llmMessagesHistory,
-            { role: 'system', message: `result: ${compactHtmlSummary}` },
+            { role: 'system', message: `Compacted HTML result: ${compactHtmlSummary}` },
         ]
 
         this.getAndExecuteCommands();

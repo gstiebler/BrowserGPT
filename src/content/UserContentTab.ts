@@ -1,16 +1,22 @@
 import _ from 'lodash';
 import { clickButton, getSummarizedHtmlFromDocument, openLink, setInputValue } from '../html/browserDriver';
+import { HtmlExtraction } from '../html/DOMSummary';
 
 
 console.log('Yes, it opened');
 
+let localExtractor: HtmlExtraction | undefined;
+
 function executeCommand(msg: any) {
+    if (_.isEmpty(localExtractor)) {
+        throw Error('localExtractor is not defined');
+    }
     if (msg.command === 'openLink') {
         return openLink(msg.link);
     } else if (msg.command === 'setInputValue') {
-        return setInputValue(msg.id, msg.value);
+        return setInputValue(msg.id, msg.value, localExtractor);
     } else if (msg.command === 'clickSubmit') {
-        return clickButton(msg.id);
+        return clickButton(msg.id, localExtractor);
     }
 }
 
@@ -29,6 +35,7 @@ chrome.runtime.onMessage.addListener(messagesFromReactApp);
 
 window.onload = function () {
     console.log("All resources finished loading!");
-    const result = getSummarizedHtmlFromDocument();
-    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: result });
+    const { compactSummary, extractor } = getSummarizedHtmlFromDocument();
+    localExtractor = extractor;
+    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: compactSummary });
 };

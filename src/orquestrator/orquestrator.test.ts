@@ -6,7 +6,7 @@ import { promptSource } from "../ai/promptSource";
 
 function summarizeHtml(html: string): string {
     const loginPageDocument = new JSDOM(html).window.document;
-    const summary = summarize(loginPageDocument);
+    const { summary, extractor } = summarize(loginPageDocument);
     return compact(summary);
 }
 
@@ -78,7 +78,7 @@ describe("orquestrator", () => {
             { role: "system", message: promptSource.getMainSystemPrompt() },
             { role: "user", message: sendReceiptUserMsg },
             { role: "assistant", message: openLinkLlmMsg },
-            { role: "system", message: `result: ${loginPageSummary}` },
+            { role: "system", message: `Compacted HTML result: ${loginPageSummary}` },
         ]);
         expect(chatMock.showMessages).nthCalledWith(3, [
             { role: "user", message: sendReceiptUserMsg },

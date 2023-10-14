@@ -10,7 +10,11 @@ type TSummaryNode = {
     children: TSummaryNode[];
 }
 
-export function summarize(document: Document) {
+type TSummary = {
+    summary: any;
+    extractor: HtmlExtraction;
+}
+export function summarize(document: Document): TSummary {
     const extractor = new HtmlExtraction();
     if (!document.body) {
         throw new Error('Document body is empty');
@@ -18,7 +22,7 @@ export function summarize(document: Document) {
     const result = extractor.processTagsRecursive(document.body) as TSummaryNode;
     const toPrint = result instanceof Array ? result[0] : result;
     const summary = printTagsRecursive(toPrint);
-    return summary;
+    return { summary, extractor };
 }
 
 export function compact(summary: any) {
@@ -82,16 +86,16 @@ function printTagsRecursive(node: TSummaryNode) {
     }
 }
 
-class HtmlExtraction {
+export class HtmlExtraction {
     key_map = {} as { [key: string]: any };
     id_counter = 0
 
-    name_map = {} as { [key: string]: any };
-    name_counter = 0
     forbiddenProps = new Set(["META", "SCRIPT", "STYLE"]);
 
-    input_show_props = new Set(["name", "type", "placeholder", "aria-label", "id", "value"]);
+    input_show_props = new Set(["type", "placeholder", "aria-label", "id", "value"]);
     always_show_tags = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT']);
+
+    getRealId = (id: string) => this.key_map[id] || id;
 
     processTagsRecursive(element: Element): TSummaryNode | TSummaryNode[] {
         const children = [] as TSummaryNode[];
@@ -152,14 +156,6 @@ class HtmlExtraction {
                 const new_id = `id${this.id_counter}`;
                 filteredInputProps.id = new_id;
                 this.key_map[new_id] = originalId;
-            }
-
-            const original_name = filteredInputProps.name;
-            if (original_name) {
-                this.name_counter += 1
-                const new_name = `name${this.name_counter}`;
-                filteredInputProps.name = new_name
-                this.name_map[new_name] = original_name
             }
 
             const line: TLine = { key: element.nodeName, value: filteredInputProps };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, Button, Typography, Container, Paper, Avatar } from '@mui/material';
+import { TextField, Button, Typography, Container, Paper, Avatar, Box } from '@mui/material';
 import { TChatItem } from './types';
 
 interface ExtensionMainTabProps {
@@ -20,9 +20,10 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
     handleSendMessage,
 }) => {
     return (
-        <Container maxWidth="md" style={{ height: '100%' }}>
-            <Paper elevation={3} style={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ margin: '20px 0' }}>
+        <Container maxWidth="md" sx={{ height: '100%' }}>
+            <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                
+                <Box mb={3}>
                     <TextField
                         label="API Key"
                         variant="outlined"
@@ -30,41 +31,37 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                         value={apiKey}
                         onChange={e => setApiKey(e.target.value)}
                     />
-                </div>
+                </Box>
 
-                <div style={{ margin: '20px 0', flexGrow: 1 }}>
+                <Box mb={3} flexGrow={1}>
                     <Typography variant="body1">Chat Log</Typography>
-                    <Paper elevation={1} style={{ padding: '10px', height: '100%', overflow: 'auto' }}>
+                    <Paper elevation={1} sx={{ p: 1, height: '100%', overflow: 'auto' }}>
                         {chatLog.map((entry, index) => (
-                            <div key={index} style={{
-                                margin: '10px 0',
-                                padding: '10px',
-                                backgroundColor: entry.role === 'user' ? '#e6f7ff' : '#f2f2f2',
-                                textAlign: entry.role === 'user' ? 'right' : 'left'
-                            }}>
+                            <Box key={index} mb={2} p={1} bgcolor={entry.role === 'user' ? '#e6f7ff' : '#f2f2f2'} textAlign={entry.role === 'user' ? 'right' : 'left'}>
                                 <Avatar>{entry.role === 'user' ? 'U' : 'S'}</Avatar>
                                 <Typography variant="body2">
                                     {entry.message}
                                 </Typography>
-                            </div>
+                            </Box>
                         ))}
                     </Paper>
-                </div>
+                </Box>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
                     <TextField
                         label="Type a message..."
                         variant="outlined"
-                        multiline  // Allows multiple lines
-                        rows={4}  // Sets the number of visible rows
-                        style={{ flex: 1 }} // Takes up the available space
+                        multiline
+                        rows={4}
+                        sx={{ flex: 1 }}
                         value={chatMessage}
                         onChange={e => setChatMessage(e.target.value)}
                     />
                     <Button variant="contained" color="primary" onClick={handleSendMessage}>
                         Send
                     </Button>
-                </div>
+                </Box>
+
             </Paper>
         </Container>
     );

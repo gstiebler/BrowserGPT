@@ -19,7 +19,6 @@ function messagesFromReactApp(
     sender: chrome.runtime.MessageSender,
     sendResponse: (response: any) => void
 ) {
-    console.log(`Received message from React app: ${JSON.stringify(msg)}`);
     const result = executeCommand(msg);
     if (!_.isEmpty(result)) {
         sendResponse({ type: 'ok response', result });

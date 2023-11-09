@@ -9,6 +9,7 @@ interface ExtensionMainTabProps {
     chatMessage: string;
     setChatMessage: (newMessage: string) => void;
     handleSendMessage: () => void;
+    reloadHtml: () => void;
 }
 
 const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
@@ -18,11 +19,11 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
     chatMessage,
     setChatMessage,
     handleSendMessage,
+    reloadHtml
 }) => {
     return (
         <Container maxWidth="md" sx={{ height: '100%' }}>
             <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                
                 <Box mb={3}>
                     <TextField
                         label="API Key"
@@ -32,7 +33,6 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                         onChange={e => setApiKey(e.target.value)}
                     />
                 </Box>
-
                 <Box mb={3} flexGrow={1}>
                     <Typography variant="body1">Chat Log</Typography>
                     <Paper elevation={1} sx={{ p: 1, height: '100%', overflow: 'auto' }}>
@@ -46,7 +46,6 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                         ))}
                     </Paper>
                 </Box>
-
                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
                     <TextField
                         label="Type a message..."
@@ -61,8 +60,11 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                         Send
                     </Button>
                 </Box>
-
             </Paper>
+
+            <Button variant="contained" color="primary" onClick={reloadHtml}>
+                Reload HTML
+            </Button>
         </Container>
     );
 };

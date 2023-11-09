@@ -17,6 +17,8 @@ function executeCommand(msg: any) {
         return setInputValue(msg.id, msg.value, localExtractor);
     } else if (msg.command === 'clickSubmit') {
         return clickButton(msg.id, localExtractor);
+    } else if (msg.command === 'reloadHtml') {
+        return sendHtml();
     }
 }
 
@@ -31,11 +33,15 @@ function messagesFromReactApp(
     }
 }
 
+function sendHtml() {
+    const { summary, extractor } = getSummarizedHtmlFromDocument();
+    localExtractor = extractor;
+    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: summary });
+}
+
 chrome.runtime.onMessage.addListener(messagesFromReactApp);
 
 window.onload = function () {
     console.log("All resources finished loading!");
-    const { compactSummary, extractor } = getSummarizedHtmlFromDocument();
-    localExtractor = extractor;
-    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: compactSummary });
+    sendHtml();
 };

@@ -1,4 +1,5 @@
 import _ from "lodash";
+import yaml from 'js-yaml';
 
 // define the type TLine
 type TLine = {
@@ -22,13 +23,8 @@ export function summarize(document: Document): TSummary {
     const result = extractor.processTagsRecursive(document.body) as TSummaryNode;
     const toPrint = result instanceof Array ? result[0] : result;
     const summary = printTagsRecursive(toPrint);
-    return { summary, extractor };
-}
-
-export function compact(summary: any) {
-    const str = JSON.stringify(summary);
-    const result = str.replaceAll('"', '');
-    return result;
+    const summaryYaml = yaml.dump(summary);
+    return { summary: summaryYaml, extractor };
 }
 
 function getImmediateTextContent(node: Element): string | null {
@@ -40,13 +36,13 @@ function getImmediateTextContent(node: Element): string | null {
 }
 
 function printTagsRecursive(node: TSummaryNode) {
-    const children = node.children as any[];
+    const children = node.children as TSummaryNode[];
     const line = node.line;
 
     let children_items = children
         .map(printTagsRecursive)
         .filter(Boolean) as any;
-    
+
     if (children_items.length === 1) {
         children_items = children_items[0]
     }
@@ -59,7 +55,7 @@ function printTagsRecursive(node: TSummaryNode) {
             .replaceAll('  ', ' ')
             .trim();
         // replace multiple spaces with single space
-        value = value.split().join();
+        value = value.split(' ').join();
         const result = [] as any[];
         if (value !== '') {
             result.push(value)
@@ -79,6 +75,9 @@ function printTagsRecursive(node: TSummaryNode) {
             return children_items
         } else {
             if (!_.isEmpty(children_items)) {
+                if (!value) {
+                    throw new Error('value is empty');
+                }
                 value.children = children_items
             }
             return value
@@ -97,6 +96,38 @@ export class HtmlExtraction {
 
     getRealId = (id: string) => this.key_map[id] || id;
 
+    private processLink(element: Element, directText?: string): TLine {
+        const input_props = {
+            type: 'link',
+            href: element.getAttribute('href'),
+        } as any;
+        if (!_.isEmpty(directText)) {
+            input_props.text = directText;
+        }
+
+        const line: TLine = { key: 'link', value: input_props };
+        return line;
+    }
+
+    private addId(originalId: string): string {
+        this.id_counter += 1
+        const new_id = `id${this.id_counter}`;
+        this.key_map[new_id] = originalId;
+        return new_id
+    }
+
+    private getFilteredProps(element: Element): { [key: string]: any } {
+        const attributeNames = element.getAttributeNames();
+        const allInputProps = attributeNames.reduce((acc, name) => {
+            return {
+                ...acc,
+                [name]: element.getAttribute(name),
+            };
+        }, {} as { [key: string]: any });
+        // return only the props we want
+        return _.pick(allInputProps, Array.from(this.input_show_props));
+    }
+
     processTagsRecursive(element: Element): TSummaryNode | TSummaryNode[] {
         const children = [] as TSummaryNode[];
         for (const child of element.childNodes) {
@@ -112,30 +143,12 @@ export class HtmlExtraction {
         }
 
         const directText = getImmediateTextContent(element)?.trim()
-        const text_is_empty = _.isEmpty(directText);
 
         if (element.tagName === 'A') {
-            const input_props = {
-                type: 'link',
-                href: element.getAttribute('href'),
-            } as any;
-            if (!_.isEmpty(directText)) {
-                input_props.text = directText;
-            }    
-
-            const line: TLine = { key: 'link', value: input_props };
-            return { line, children };
+            return { line: this.processLink(element, directText), children };
         }
         if (this.always_show_tags.has(element.tagName)) {
-            // filter input attributes to only show the ones we want
-            const attributeNames = element.getAttributeNames();
-            const input_props = attributeNames.reduce((acc, name) => {
-                if (this.input_show_props.has(name)) {
-                    acc[name] = element.getAttribute(name);
-                }
-                return acc;
-            }, {} as { [key: string]: any });
-
+            const input_props = this.getFilteredProps(element);
 
             if (element.getAttribute('type') === 'hidden') {
                 return children
@@ -152,20 +165,18 @@ export class HtmlExtraction {
 
             const originalId = filteredInputProps.id;
             if (originalId) {
-                this.id_counter += 1
-                const new_id = `id${this.id_counter}`;
-                filteredInputProps.id = new_id;
-                this.key_map[new_id] = originalId;
+                filteredInputProps.id = this.addId(originalId);
             }
 
             const line: TLine = { key: element.nodeName, value: filteredInputProps };
             return { line, children };
         }
-        const new_line = { key: element.nodeName, value: directText };
-        if ((text_is_empty && children.length === 0) || (children.length === 1)) {
+        const newLine: TLine = { key: element.nodeName, value: directText };
+        const textIsEmpty = _.isEmpty(directText);
+        if ((textIsEmpty && children.length === 0) || (children.length === 1)) {
             return children;
         } else {
-            return { line: new_line, children };
+            return { line: newLine, children };
         }
     }
 }

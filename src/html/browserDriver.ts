@@ -1,17 +1,14 @@
-import { compact, summarize, HtmlExtraction } from "./DOMSummary";
+import { summarize, HtmlExtraction } from "./DOMSummary";
 
 type TSummarizedHtml = {
-    compactSummary: any;
+    summary: any;
     extractor: HtmlExtraction;
 }
 export function getSummarizedHtmlFromDocument(): TSummarizedHtml {
     const { summary, extractor } = summarize(document);
-    console.log('Summary without compaction');
+    console.log('Summary');
     console.log(summary);
-    const compactSummary = compact(summary);
-    console.log('Summary with compaction');
-    console.log(compactSummary);
-    return { compactSummary, extractor };
+    return { summary, extractor };
 }
 
 export function setInputValue(id: string, value: string, extractor: HtmlExtraction) {

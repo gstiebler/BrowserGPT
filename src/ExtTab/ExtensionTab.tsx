@@ -85,6 +85,7 @@ const ExtensionTab: React.FC = () => {
           chatMessage={chatMessage}
           setChatMessage={setChatMessage}
           handleSendMessage={handleSendMessage}
+          reloadHtml={() => sendMessageToUserTab({ command: 'reloadHtml' })}
         />
     );
 };

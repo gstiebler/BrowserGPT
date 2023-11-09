@@ -1,13 +1,13 @@
 import { JSDOM } from "jsdom";
 import { commandsSeparatorStr, extractCommands, extractMessageToUser,  } from "../ai/extractCommands";
 import { Chat, HTMLDoc, LLM, Orquestrator } from "./orquestrator";
-import { compact, summarize } from "../html/DOMSummary";
+import { summarize } from "../html/DOMSummary";
 import { promptSource } from "../ai/promptSource";
 
 function summarizeHtml(html: string): string {
     const loginPageDocument = new JSDOM(html).window.document;
     const { summary, extractor } = summarize(loginPageDocument);
-    return compact(summary);
+    return summary;
 }
 
 describe("orquestrator", () => {

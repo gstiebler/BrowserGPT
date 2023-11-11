@@ -28,62 +28,32 @@ export function summarize(document: Document): TSummary {
     return { summary: summaryYaml, extractor };
 }
 
+function cleanText(text: string): string {
+    return text
+        .replaceAll('\n', ' ')
+        .replaceAll('  ', ' ')
+        .trim();
+}
+
 function getImmediateTextContent(node: Element): string | null {
     const clonedNode = node.cloneNode(true);
     while (clonedNode.firstChild) {
         clonedNode.removeChild(clonedNode.firstChild);
     }
-    return clonedNode.textContent;
+    const text = clonedNode.textContent;
+    return text ? cleanText(text) : null;
 }
 
-function printTagsRecursive(node: TSummaryNode) {
-    const children = node.children as TSummaryNode[];
-    const line = node.line;
-
-    let children_items = children
-        .map(printTagsRecursive)
-        .filter(Boolean) as any;
-
-    if (children_items.length === 1) {
-        children_items = children_items[0]
+export function printTagsRecursive(node: TSummaryNode): any[] {
+    const { line, children } = node;
+    const { nodeName, text, props } = line;
+    if (!_.isEmpty(props)) {
+        return [props];
     }
-
-    let value = '';//line.value;
-
-    if (value instanceof String) {
-        value = value
-            .replaceAll('\n', ' ')
-            .replaceAll('  ', ' ')
-            .trim();
-        // replace multiple spaces with single space
-        value = value.split(' ').join();
-        const result = [] as any[];
-        if (value !== '') {
-            result.push(value)
-        }
-        if (!_.isEmpty(children_items)) {
-            result.push(children_items)
-        }
-        if (result.length === 0) {
-            return null
-        } else if (result.length === 1) {
-            return result[0]
-        } else {
-            return result
-        }
-    } else {
-        if (_.isEmpty(value)) {
-            return children_items
-        } else {
-            if (!_.isEmpty(children_items)) {
-                if (!value) {
-                    throw new Error('value is empty');
-                }
-                value.children = children_items
-            }
-            return value
-        }
+    if (!_.isEmpty(text)) {
+        return [text];
     }
+    return children.map(printTagsRecursive);
 }
 
 export class HtmlExtraction {
@@ -174,7 +144,7 @@ export class HtmlExtraction {
             return node;
         }
         if (node.children.length === 1) {
-            return node.children[0];
+            return this.findFirstNodeWithContent(node.children[0]);
         }
         throw new Error('impossible situation');
     }

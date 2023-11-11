@@ -1,4 +1,4 @@
-import { HtmlExtraction, summarize } from "./DOMSummary";
+import { HtmlExtraction, printTagsRecursive, summarize } from "./DOMSummary";
 
 import { JSDOM } from "jsdom";
 import fs from "fs";
@@ -20,6 +20,17 @@ describe("summary", () => {
         const dom = new JSDOM(canadaLifeHTML);
         const extractor = new HtmlExtraction();
         const result = extractor.processTagsRecursive(dom.window.document.body);
+        console.log(JSON.stringify(result, null, 2));
+        expect(result).toBe(16);
+    });
+
+    it("print tags", () => {
+        const canadaLifeHTML = fs.readFileSync(path.resolve(__dirname, "../test_resources/canada_life.html"), "utf8");
+        // create a JSDOM object from the HTML
+        const dom = new JSDOM(canadaLifeHTML);
+        const extractor = new HtmlExtraction();
+        const summary = extractor.processTagsRecursive(dom.window.document.body);
+        const result = printTagsRecursive(summary);
         console.log(JSON.stringify(result, null, 2));
         expect(result).toBe(16);
     });

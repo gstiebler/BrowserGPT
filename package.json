@@ -25,7 +25,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "INLINE_RUNTIME_CHUNK=false craco build",
-    "test": "react-scripts test",
+    "test": "CI=true react-scripts test",
     "prompt_test": "tsc && node dist/dev/promptTest.js",
     "pdf_test": "tsc && node dist/dev/pdfTest.js",
     "eject": "react-scripts eject"

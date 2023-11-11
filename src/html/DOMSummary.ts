@@ -3,7 +3,7 @@ import yaml from 'js-yaml';
 
 // define the type TLine
 type TLine = {
-    key: string;
+    nodeName: string;
     text?: string;
     props?: { [key: string]: any };
 }
@@ -106,7 +106,7 @@ export class HtmlExtraction {
             inputProps.text = directText;
         }
 
-        return { key: 'link', text: directText, props: inputProps };
+        return { nodeName: 'link', text: directText, props: inputProps };
     }
 
     private addId(originalId: string): string {
@@ -136,6 +136,10 @@ export class HtmlExtraction {
         return this.forbiddenProps.has(element.tagName);
     }
 
+    filterTSummaryNode(node: TSummaryNode): boolean {
+        return _.isEmpty(node.line.text) && _.isEmpty(node.line.props) && _.isEmpty(node.children);
+    }
+
     getProps(element: Element): _.Dictionary<string> | undefined {
         if (this.alwaysShowTags.has(element.tagName)) {
             const inputProps = this.getFilteredProps(element);
@@ -159,8 +163,22 @@ export class HtmlExtraction {
             return this.processLink(element, directText);
         }
 
-        return { key: element.nodeName, text: directText, props: this.getProps(element) };
+        return { nodeName: element.nodeName, text: directText, props: this.getProps(element) };
     }
+
+    findFirstNodeWithContent(node: TSummaryNode): TSummaryNode {
+        if (!_.isEmpty(node.line.text) || !_.isEmpty(node.line.props)) {
+            return node;
+        }
+        if (node.children.length > 1) {
+            return node;
+        }
+        if (node.children.length === 1) {
+            return node.children[0];
+        }
+        throw new Error('impossible situation');
+    }
+        
 
     processTagsRecursive(element: Element): TSummaryNode {
         const children = [] as TSummaryNode[];
@@ -169,7 +187,11 @@ export class HtmlExtraction {
                 continue;
             }
             const localChild = this.processTagsRecursive(child as Element);
-            children.push(localChild);
+            if (this.filterTSummaryNode(localChild)) {
+                continue;
+            }
+            const firstNodeWithContent = this.findFirstNodeWithContent(localChild);
+            children.push(firstNodeWithContent);
         }
         return { line: this.elementToTLine(element), children };
     }

@@ -17,7 +17,7 @@ You have access to the following commands to interact with the browser:
 2. ${clickButtonCommand}: Clicks in a button. Params: (id: string)
 3. ${setInputValueCommand}: Sets the value of an input. Params (id: string, value: string)
 
-The format of the HTMl summary ${openLinkCommand} returns may include, for example:
+The format of the HTML summary ${openLinkCommand} returns may include, for example:
 {
     type: link,
     href: https://www.canadalife.com/sign-in.html,

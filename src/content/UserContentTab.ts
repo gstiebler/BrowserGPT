@@ -35,8 +35,9 @@ function messagesFromReactApp(
 
 function sendHtml() {
     const { summary, extractor } = getSummarizedHtmlFromDocument();
+    const stringSummary = JSON.stringify(summary, null, 1);
     localExtractor = extractor;
-    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: summary });
+    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: stringSummary });
 }
 
 chrome.runtime.onMessage.addListener(messagesFromReactApp);

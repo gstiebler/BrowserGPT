@@ -13,12 +13,13 @@ async function sendInternal(apiKey: string, messagesLlm: LLMMessage[]): Promise<
         content: message.message,
     }));
 
-    const gpt4Model = "gpt-4-0613";
+    const gpt4Preview = "gpt-4-1106-preview";
+    const gpt4Model = "gpt-4";
     const gpt4_32kModel = "gpt-4-32k-0613";
-    const gpt3Model = "gpt-3.5-turbo-0613";
+    const gpt3Model = "gpt-3.5-turbo-1106";
     const gpt3_16kModel = "gpt-3.5-turbo-16k-0613";
     const response = await openai.chat.completions.create({
-        model: gpt4Model,
+        model: gpt3_16kModel,
         messages,
         temperature: 0,
         max_tokens: 1024,

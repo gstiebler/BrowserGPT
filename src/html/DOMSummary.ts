@@ -1,5 +1,4 @@
 import _ from "lodash";
-import yaml from 'js-yaml';
 
 // define the type TLine
 type TLine = {
@@ -23,8 +22,7 @@ export function summarize(document: Document): TSummary {
     }
     const result = extractor.processTagsRecursive(document.body);
     const summary = printTagsRecursive(result);
-    const summaryYaml = yaml.dump(summary);
-    return { summary: summaryYaml, extractor };
+    return { summary, extractor };
 }
 
 function cleanText(text: string): string {
@@ -40,7 +38,7 @@ function getImmediateTextContent(node: Element): string | null {
     while (clonedNode.firstChild) {
         clonedNode.removeChild(clonedNode.firstChild);
     }
-    const text = clonedNode.textContent;
+    const text = _.isEmpty(clonedNode.textContent) ? (node as any).text : clonedNode.textContent;
     return text ? cleanText(text) : null;
 }
 

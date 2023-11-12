@@ -10,7 +10,7 @@ describe("summary", () => {
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
         const { summary, extractor } = summarize(dom.window.document);
-        console.log(JSON.stringify(summary, null, 2));
+        console.log(summary);
         expect(summary).toBe(15);
     });
 

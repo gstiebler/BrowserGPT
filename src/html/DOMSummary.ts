@@ -21,18 +21,18 @@ export function summarize(document: Document): TSummary {
     if (!document.body) {
         throw new Error('Document body is empty');
     }
-    const result = extractor.processTagsRecursive(document.body) as TSummaryNode;
-    const toPrint = result instanceof Array ? result[0] : result;
-    const summary = printTagsRecursive(toPrint);
+    const result = extractor.processTagsRecursive(document.body);
+    const summary = printTagsRecursive(result);
     const summaryYaml = yaml.dump(summary);
     return { summary: summaryYaml, extractor };
 }
 
 function cleanText(text: string): string {
-    return text
-        .replaceAll('\n', ' ')
-        .replaceAll('  ', ' ')
-        .trim();
+    let localText = text.replaceAll('\n', ' ');
+    while (localText.includes('  ')) {
+        localText = localText.replace('  ', ' ');
+    }
+    return localText.trim();
 }
 
 function getImmediateTextContent(node: Element): string | null {
@@ -44,14 +44,14 @@ function getImmediateTextContent(node: Element): string | null {
     return text ? cleanText(text) : null;
 }
 
-export function printTagsRecursive(node: TSummaryNode): any[] {
+export function printTagsRecursive(node: TSummaryNode): any {
     const { line, children } = node;
     const { nodeName, text, props } = line;
     if (!_.isEmpty(props)) {
-        return [props];
+        return props;
     }
     if (!_.isEmpty(text)) {
-        return [text];
+        return text;
     }
     return children.map(printTagsRecursive);
 }
@@ -99,15 +99,22 @@ export class HtmlExtraction {
     }
 
     filterElement(element: Element): boolean {
-        if (element.getAttribute && element.getAttribute('type') === 'hidden') {
-            return false;
+        const props = this.getProps(element);
+        if (props?.type === 'hidden') {
+            return true;
         }
 
         return this.forbiddenProps.has(element.tagName);
     }
 
     filterTSummaryNode(node: TSummaryNode): boolean {
-        return _.isEmpty(node.line.text) && _.isEmpty(node.line.props) && _.isEmpty(node.children);
+        if (_.isEmpty(node.line.props)) {
+            return _.isEmpty(node.line.text) && _.isEmpty(node.children);
+        } else {
+            const isLink = node.line.nodeName === 'link';
+            const hasId = Boolean(node.line.props?.id);
+            return (!isLink && !hasId);
+        }
     }
 
     getProps(element: Element): _.Dictionary<string> | undefined {
@@ -148,7 +155,6 @@ export class HtmlExtraction {
         }
         throw new Error('impossible situation');
     }
-        
 
     processTagsRecursive(element: Element): TSummaryNode {
         const children = [] as TSummaryNode[];

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { clickButton, getSummarizedHtmlFromDocument, openLink, setInputValue } from '../html/browserDriver';
 import { HtmlExtraction } from '../html/DOMSummary';
+import { clickButtonMsg, openLinkMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
 
 
 console.log('Yes, it opened');
@@ -11,13 +12,13 @@ function executeCommand(msg: any) {
     if (_.isEmpty(localExtractor)) {
         throw Error('localExtractor is not defined');
     }
-    if (msg.command === 'openLink') {
+    if (msg.command === openLinkMsg) {
         return openLink(msg.link);
-    } else if (msg.command === 'setInputValue') {
+    } else if (msg.command === setInputValueMsg) {
         return setInputValue(msg.id, msg.value, localExtractor);
-    } else if (msg.command === 'clickSubmit') {
+    } else if (msg.command === clickButtonMsg) {
         return clickButton(msg.id, localExtractor);
-    } else if (msg.command === 'reloadHtml') {
+    } else if (msg.command === reloadHtmlMsg) {
         return sendHtml();
     }
 }

@@ -1,5 +1,5 @@
 import { Command } from "../ai/extractCommands";
-import { clickButtonCommand, openLinkCommand, setInputValueCommand } from "../ai/promptSource";
+import { clickButtonCommand, openLinkCommand, setInputValueCommand } from "../constants";
 
 export type LLMMessage = {
     role: 'system' | 'assistant' | 'user';

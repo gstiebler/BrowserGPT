@@ -19,7 +19,7 @@ async function sendInternal(apiKey: string, messagesLlm: LLMMessage[]): Promise<
     const gpt3Model = "gpt-3.5-turbo-1106";
     const gpt3_16kModel = "gpt-3.5-turbo-16k-0613";
     const response = await openai.chat.completions.create({
-        model: gpt3_16kModel,
+        model: gpt4Preview,
         messages,
         temperature: 0,
         max_tokens: 1024,

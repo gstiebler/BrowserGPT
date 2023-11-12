@@ -5,6 +5,7 @@ import { extractCommands, extractMessageToUser } from '../ai/extractCommands';
 import { promptSource } from '../ai/promptSource';
 import { TChatItem } from './types';
 import ExtensionMainTab from './ExtensionMainTab';
+import { clickButtonMsg, openLinkMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
 
 
 async function sendMessageToUserTab(payload: any) {
@@ -18,14 +19,14 @@ async function sendMessageToUserTab(payload: any) {
 
 const htmlDoc = {
     setInputValue: (id: string, value: string) => {
-        sendMessageToUserTab({ command: 'setInputValue', id, value });
+        sendMessageToUserTab({ command: setInputValueMsg, id, value });
     },
     openLink: async (link: string) => {
-        const result = await sendMessageToUserTab({ command: 'openLink', link });
+        const result = await sendMessageToUserTab({ command: openLinkMsg, link });
         console.log(result);
     },
     clickSubmit: (id: string) => {
-        sendMessageToUserTab({ command: 'clickSubmit', id });
+        sendMessageToUserTab({ command: clickButtonMsg, id });
     },
 };
 
@@ -85,7 +86,7 @@ const ExtensionTab: React.FC = () => {
           chatMessage={chatMessage}
           setChatMessage={setChatMessage}
           handleSendMessage={handleSendMessage}
-          reloadHtml={() => sendMessageToUserTab({ command: 'reloadHtml' })}
+          reloadHtml={() => sendMessageToUserTab({ command: reloadHtmlMsg })}
         />
     );
 };

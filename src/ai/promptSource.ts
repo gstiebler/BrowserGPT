@@ -1,8 +1,5 @@
+import { clickButtonCommand, openLinkCommand, setInputValueCommand } from "../constants";
 import { commandsSeparatorStr } from "./extractCommands";
-
-export const openLinkCommand = 'open_url';
-export const clickButtonCommand = 'click_button';
-export const setInputValueCommand = 'set_input_value';
 
 export const promptSource = {
     getMainSystemPrompt: () => `
@@ -38,12 +35,6 @@ It represents a HTML button with id "id6" and text "Advisors" inside.
 To click this button, you need to output: 
 ${commandsSeparatorStr}
 ${clickButtonCommand}("id6")
-${commandsSeparatorStr}
-
-One example of your output may be:
-I'll now search for the best 5 chairs under $500
-${commandsSeparatorStr}
-${openLinkCommand}("www.google.com")
 ${commandsSeparatorStr}
 `,
 };

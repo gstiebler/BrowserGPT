@@ -7,4 +7,6 @@ export const reloadHtmlCommand = 'reload_html';
 export const openLinkMsg = 'openLink';
 export const clickButtonMsg = 'clickButton';
 export const setInputValueMsg = 'setInputValue';
+export const printHtmlMsg = 'printHtml';
 export const reloadHtmlMsg = 'reloadHtml';
+export const htmlDocumentChangedMsg = 'htmlDocumentChanged';

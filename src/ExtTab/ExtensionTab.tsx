@@ -5,7 +5,7 @@ import { extractCommands, extractMessageToUser } from '../ai/extractCommands';
 import { promptSource } from '../ai/promptSource';
 import { TChatItem } from './types';
 import ExtensionMainTab from './ExtensionMainTab';
-import { clickButtonMsg, openLinkMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
+import { clickButtonMsg, htmlDocumentChangedMsg, openLinkMsg, printHtmlMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
 
 
 async function sendMessageToUserTab(payload: any) {
@@ -62,7 +62,7 @@ const ExtensionTab: React.FC = () => {
         const orquestrator = getOrquestrator(apiKey, chat);
 
         chrome.runtime?.onMessage.addListener((msg: any) => {
-            if (msg.type === 'htmlDocumentChanged') {
+            if (msg.type === htmlDocumentChangedMsg) {
                 orquestrator.htmlDocumentChanged(msg.compactHtml);
             }
         });
@@ -86,6 +86,7 @@ const ExtensionTab: React.FC = () => {
           chatMessage={chatMessage}
           setChatMessage={setChatMessage}
           handleSendMessage={handleSendMessage}
+          printHtml={() => sendMessageToUserTab({ command: printHtmlMsg })}
           reloadHtml={() => sendMessageToUserTab({ command: reloadHtmlMsg })}
         />
     );

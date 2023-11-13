@@ -9,6 +9,7 @@ interface ExtensionMainTabProps {
     chatMessage: string;
     setChatMessage: (newMessage: string) => void;
     handleSendMessage: () => void;
+    printHtml: () => void;
     reloadHtml: () => void;
 }
 
@@ -19,6 +20,7 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
     chatMessage,
     setChatMessage,
     handleSendMessage,
+    printHtml,
     reloadHtml
 }) => {
     return (
@@ -64,6 +66,10 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
 
             <Button variant="contained" color="primary" onClick={reloadHtml}>
                 Reload HTML
+            </Button>
+
+            <Button variant="contained" color="primary" onClick={printHtml}>
+                Print HTML
             </Button>
         </Container>
     );

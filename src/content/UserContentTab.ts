@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { clickButton, getSummarizedHtmlFromDocument, openLink, setInputValue } from '../html/browserDriver';
 import { HtmlExtraction } from '../html/DOMSummary';
-import { clickButtonMsg, openLinkMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
+import { clickButtonMsg, htmlDocumentChangedMsg, openLinkMsg, printHtmlMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
 
 
 console.log('Yes, it opened');
@@ -20,6 +20,8 @@ function executeCommand(msg: any) {
         return clickButton(msg.id, localExtractor);
     } else if (msg.command === reloadHtmlMsg) {
         return sendHtml();
+    } else if (msg.command === printHtmlMsg) {
+        return printHtml();
     }
 }
 
@@ -34,11 +36,17 @@ function messagesFromReactApp(
     }
 }
 
+function printHtml() {
+    const { summary, extractor } = getSummarizedHtmlFromDocument();
+    console.log('Summarized HTML');
+    console.log(summary);
+}
+
 function sendHtml() {
     const { summary, extractor } = getSummarizedHtmlFromDocument();
     const stringSummary = JSON.stringify(summary, null, 1);
     localExtractor = extractor;
-    chrome.runtime.sendMessage({ type: 'htmlDocumentChanged', compactHtml: stringSummary });
+    chrome.runtime.sendMessage({ type: htmlDocumentChangedMsg, compactHtml: stringSummary });
 }
 
 chrome.runtime.onMessage.addListener(messagesFromReactApp);

@@ -12,17 +12,19 @@ function executeCommand(msg: any) {
     if (_.isEmpty(localExtractor)) {
         throw Error('localExtractor is not defined');
     }
-    if (msg.command === openLinkMsg) {
-        return openLink(msg.link);
-    } else if (msg.command === setInputValueMsg) {
-        return setInputValue(msg.id, msg.value, localExtractor);
-    } else if (msg.command === clickButtonMsg) {
-        return clickButton(msg.id, localExtractor);
-    } else if (msg.command === reloadHtmlMsg) {
-        return sendHtml();
-    } else if (msg.command === printHtmlMsg) {
-        return printHtml();
+
+    const commandToFunction: { [key: string]: Function } = {
+        [openLinkMsg]: () => openLink(msg.link),
+        [setInputValueMsg]: () => setInputValue(msg.id, msg.value, localExtractor!),
+        [clickButtonMsg]: () => clickButton(msg.id, localExtractor!),
+        [reloadHtmlMsg]: () => sendHtml(),
+        [printHtmlMsg]: () => printHtml(),
+    };
+    const fn = commandToFunction[msg.command];
+    if (_.isEmpty(fn)) {
+        throw Error(`Command ${msg.command} is not supported`);
     }
+    return fn();
 }
 
 function messagesFromReactApp(

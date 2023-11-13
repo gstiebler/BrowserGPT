@@ -19,13 +19,15 @@ async function sendMessageToUserTab(payload: any) {
 
 const htmlDoc = {
     setInputValue: (id: string, value: string) => {
+        console.log('setInputValue');
         sendMessageToUserTab({ command: setInputValueMsg, id, value });
     },
     openLink: async (link: string) => {
+        console.log('openLink');
         const result = await sendMessageToUserTab({ command: openLinkMsg, link });
-        console.log(result);
     },
     clickSubmit: (id: string) => {
+        console.log('clickSubmit');
         sendMessageToUserTab({ command: clickButtonMsg, id });
     },
 };
@@ -62,6 +64,7 @@ const ExtensionTab: React.FC = () => {
         const orquestrator = getOrquestrator(apiKey, chat);
 
         chrome.runtime?.onMessage.addListener((msg: any) => {
+            console.log('msg received', msg);
             if (msg.type === htmlDocumentChangedMsg) {
                 orquestrator.htmlDocumentChanged(msg.compactHtml);
             }

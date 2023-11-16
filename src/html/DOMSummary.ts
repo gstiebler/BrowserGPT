@@ -58,7 +58,7 @@ export function printTagsRecursive(node: TSummaryNode): any {
 export class HtmlExtraction {
     keyMap = {} as _.Dictionary<HTMLElement>;
 
-    forbiddenProps = new Set(["META", "SCRIPT", "STYLE"]);
+    forbiddenProps = new Set(["meta", "script", "style"]);
 
     inputShowProps = new Set(["type", "placeholder", "aria-label", "value"]);
     alwaysShowTags = new Set(['button', 'input', 'textarea', 'select']);
@@ -93,7 +93,7 @@ export class HtmlExtraction {
             };
         }, {} as { [key: string]: any });
         // return only the props we want
-        return _.pickBy(allInputProps, prop => this.inputShowProps.has(prop.toLowerCase())));
+        return _.pickBy(allInputProps, prop => this.inputShowProps.has(prop.toLowerCase()));
     }
 
     private filterElement(element: HTMLElement): boolean {
@@ -102,7 +102,7 @@ export class HtmlExtraction {
             return true;
         }
 
-        return this.forbiddenProps.has(element.tagName);
+        return this.forbiddenProps.has(element.tagName?.toLowerCase());
     }
 
     private filterTSummaryNode(node: TSummaryNode): boolean {
@@ -119,7 +119,7 @@ export class HtmlExtraction {
     }
 
     private getProps(element: HTMLElement): _.Dictionary<string> | undefined {
-        if (this.alwaysShowTags.has(element.tagName.toLowerCase())) {
+        if (this.alwaysShowTags.has(element.tagName?.toLowerCase())) {
             const inputProps = this.getFilteredProps(element);
             inputProps.type = inputProps.type || element.nodeName;
             const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
@@ -134,7 +134,7 @@ export class HtmlExtraction {
     private elementToTLine(element: HTMLElement): TLine {
         const directText = getImmediateTextContent(element)?.trim();
 
-        if (element.tagName.toLowerCase() == 'a') {
+        if (element.tagName?.toLowerCase() == 'a') {
             return this.processLink(element, directText);
         }
 

@@ -47,7 +47,14 @@ export function printTagsRecursive(node: TSummaryNode): any {
     const { nodeName, text, props } = line;
     if (!_.isEmpty(props)) {
         const expandedChildren = children.length > 0 ? children.map(printTagsRecursive) : undefined;
-        return { ...props, children: expandedChildren };
+        const firstexpandedChild = expandedChildren?.[0];
+        const hasOneTextChild = children.length === 1 && _.isEmpty(firstexpandedChild?.line?.props?.text);
+        if (hasOneTextChild) {
+            const singleChildText = children[0].line.text;
+            return { ...props, text: singleChildText };
+        } else {
+            return props;
+        }
     }
     if (!_.isEmpty(text)) {
         return text;
@@ -96,10 +103,14 @@ export class HtmlExtraction {
         return _.pickBy(allInputProps, prop => this.inputShowProps.has(prop.toLowerCase()));
     }
 
+    private getElementType(element: HTMLElement): string | undefined {
+        return element.getAttribute ? (element.getAttribute('type') || element.nodeName) : undefined;
+    }
+
     private shouldProcessChildren(element: HTMLElement): boolean {
-        const props = this.getProps(element);
-        const isHidden = props?.type?.toLowerCase() === 'hidden';
-        const isComment = element.nodeName === '#comment' || props?.type?.toLowerCase() === '#comment';
+        const type = this.getElementType(element)?.toLowerCase();
+        const isHidden = type === 'hidden';
+        const isComment = element.nodeName === '#comment' || type === '#comment';
         if (isHidden || isComment) {
             return false;
         }
@@ -107,11 +118,18 @@ export class HtmlExtraction {
         return !this.forbiddenProps.has(element.tagName?.toLowerCase());
     }
 
+    private shouldProcessElement(element: HTMLElement): boolean {
+        const isSubmitButton = element.tagName?.toLowerCase() === 'button' && 
+            (element as any).type?.toLowerCase() === 'submit';
+        const shownTag = this.alwaysShowTags.has(element.tagName?.toLowerCase());
+        return isSubmitButton || shownTag;
+    }
+
     private filterTSummaryNode(node: TSummaryNode): boolean {
         if (_.isEmpty(node.line.props)) {
             return _.isEmpty(node.line.text) && _.isEmpty(node.children);
         } else {
-            const isLink = node.line.nodeName === 'link';
+            const isLink = node.line.nodeName === 'link' && node.line.text !== 'javascript:void(0)';
             const hasText = !_.isEmpty(node.line.text);
             if (!isLink) { 
                 return false;
@@ -120,20 +138,14 @@ export class HtmlExtraction {
         }
     }
 
-    private getProps(element: HTMLElement): _.Dictionary<string> | undefined {
-        const isSubmitButton = element.tagName?.toLowerCase() === 'button' && 
-            (element as any).type?.toLowerCase() === 'submit';
-        const shownTag = this.alwaysShowTags.has(element.tagName?.toLowerCase());
-        if (isSubmitButton || shownTag) {
-            const inputProps = this.getFilteredProps(element);
-            inputProps.type = inputProps.type || element.nodeName;
-            const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
+    private getProps(element: HTMLElement): _.Dictionary<string> {
+        const inputProps = this.getFilteredProps(element);
+        inputProps.type = this.getElementType(element);
+        const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
 
-            element.id = this.addId(element);
-
-            return filteredInputProps;
-        }
-        return undefined;
+        element.id = this.addId(element);
+        
+        return filteredInputProps;
     }
 
     private elementToTLine(element: HTMLElement): TLine {
@@ -142,8 +154,8 @@ export class HtmlExtraction {
         if (element.tagName?.toLowerCase() == 'a') {
             return this.processLink(element, directText);
         }
-
-        return { nodeName: element.nodeName, text: directText, props: this.getProps(element) };
+        const props = this.shouldProcessElement(element) ? this.getProps(element) : undefined;
+        return { nodeName: element.nodeName, text: directText, props };
     }
 
     private findFirstNodeWithContent(node: TSummaryNode): TSummaryNode {

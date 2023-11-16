@@ -61,7 +61,7 @@ export class HtmlExtraction {
     forbiddenProps = new Set(["meta", "script", "style"]);
 
     inputShowProps = new Set(["type", "placeholder", "aria-label", "value"]);
-    alwaysShowTags = new Set(['button', 'input', 'textarea', 'select']);
+    alwaysShowTags = new Set(['input', 'textarea', 'select']);
 
     public getElementFromId = (id: string): HTMLElement => this.keyMap[id];
 
@@ -96,13 +96,15 @@ export class HtmlExtraction {
         return _.pickBy(allInputProps, prop => this.inputShowProps.has(prop.toLowerCase()));
     }
 
-    private filterElement(element: HTMLElement): boolean {
+    private shouldProcessChildren(element: HTMLElement): boolean {
         const props = this.getProps(element);
-        if (props?.type === 'hidden') {
-            return true;
+        const isHidden = props?.type?.toLowerCase() === 'hidden';
+        const isComment = element.nodeName === '#comment' || props?.type?.toLowerCase() === '#comment';
+        if (isHidden || isComment) {
+            return false;
         }
 
-        return this.forbiddenProps.has(element.tagName?.toLowerCase());
+        return !this.forbiddenProps.has(element.tagName?.toLowerCase());
     }
 
     private filterTSummaryNode(node: TSummaryNode): boolean {
@@ -119,12 +121,15 @@ export class HtmlExtraction {
     }
 
     private getProps(element: HTMLElement): _.Dictionary<string> | undefined {
-        if (this.alwaysShowTags.has(element.tagName?.toLowerCase())) {
+        const isSubmitButton = element.tagName?.toLowerCase() === 'button' && 
+            (element as any).type?.toLowerCase() === 'submit';
+        const shownTag = this.alwaysShowTags.has(element.tagName?.toLowerCase());
+        if (isSubmitButton || shownTag) {
             const inputProps = this.getFilteredProps(element);
             inputProps.type = inputProps.type || element.nodeName;
             const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
 
-            this.addId(element);
+            element.id = this.addId(element);
 
             return filteredInputProps;
         }
@@ -157,7 +162,7 @@ export class HtmlExtraction {
     public processTagsRecursive(element: HTMLElement): TSummaryNode {
         const children = [] as TSummaryNode[];
         for (const child of element.childNodes) {
-            if (this.filterElement(child as HTMLElement)) {
+            if (!this.shouldProcessChildren(child as HTMLElement)) {
                 continue;
             }
             const localChild = this.processTagsRecursive(child as HTMLElement);

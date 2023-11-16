@@ -46,7 +46,8 @@ export function printTagsRecursive(node: TSummaryNode): any {
     const { line, children } = node;
     const { nodeName, text, props } = line;
     if (!_.isEmpty(props)) {
-        return props;
+        const expandedChildren = children.length > 0 ? children.map(printTagsRecursive) : undefined;
+        return { ...props, children: expandedChildren };
     }
     if (!_.isEmpty(text)) {
         return text;
@@ -55,15 +56,14 @@ export function printTagsRecursive(node: TSummaryNode): any {
 }
 
 export class HtmlExtraction {
-    key_map = {} as _.Dictionary<string>;
-    id_counter = 0
+    keyMap = {} as _.Dictionary<HTMLElement>;
 
     forbiddenProps = new Set(["META", "SCRIPT", "STYLE"]);
 
-    inputShowProps = new Set(["type", "placeholder", "aria-label", "id", "value"]);
-    alwaysShowTags = new Set(['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT']);
+    inputShowProps = new Set(["type", "placeholder", "aria-label", "value"]);
+    alwaysShowTags = new Set(['button', 'input', 'textarea', 'select']);
 
-    getRealId = (id: string) => this.key_map[id] || id;
+    public getElementFromId = (id: string): HTMLElement => this.keyMap[id];
 
     private processLink(element: Element, directText?: string): TLine {
         const inputProps = {
@@ -77,10 +77,10 @@ export class HtmlExtraction {
         return { nodeName: 'link', text: directText, props: inputProps };
     }
 
-    private addId(originalId: string): string {
-        this.id_counter += 1
-        const newId = `id${this.id_counter}`;
-        this.key_map[newId] = originalId;
+    private addId(element: HTMLElement): string {
+        const idIndex = this.keyMap.length;
+        const newId = `id${idIndex}`;
+        this.keyMap[newId] = element;
         return newId
     }
 
@@ -93,10 +93,10 @@ export class HtmlExtraction {
             };
         }, {} as { [key: string]: any });
         // return only the props we want
-        return _.pick(allInputProps, Array.from(this.inputShowProps));
+        return _.pickBy(allInputProps, prop => this.inputShowProps.has(prop.toLowerCase())));
     }
 
-    filterElement(element: Element): boolean {
+    private filterElement(element: HTMLElement): boolean {
         const props = this.getProps(element);
         if (props?.type === 'hidden') {
             return true;
@@ -105,43 +105,43 @@ export class HtmlExtraction {
         return this.forbiddenProps.has(element.tagName);
     }
 
-    filterTSummaryNode(node: TSummaryNode): boolean {
+    private filterTSummaryNode(node: TSummaryNode): boolean {
         if (_.isEmpty(node.line.props)) {
             return _.isEmpty(node.line.text) && _.isEmpty(node.children);
         } else {
             const isLink = node.line.nodeName === 'link';
-            const hasId = Boolean(node.line.props?.id);
-            return (!isLink && !hasId);
+            const hasText = !_.isEmpty(node.line.text);
+            if (!isLink) { 
+                return false;
+            }
+            return !(isLink || hasText);
         }
     }
 
-    getProps(element: Element): _.Dictionary<string> | undefined {
-        if (this.alwaysShowTags.has(element.tagName)) {
+    private getProps(element: HTMLElement): _.Dictionary<string> | undefined {
+        if (this.alwaysShowTags.has(element.tagName.toLowerCase())) {
             const inputProps = this.getFilteredProps(element);
             inputProps.type = inputProps.type || element.nodeName;
             const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
 
-            const originalId = filteredInputProps.id;
-            if (originalId) {
-                filteredInputProps.id = this.addId(originalId);
-            }
+            this.addId(element);
 
             return filteredInputProps;
         }
         return undefined;
     }
 
-    elementToTLine(element: Element): TLine {
+    private elementToTLine(element: HTMLElement): TLine {
         const directText = getImmediateTextContent(element)?.trim();
 
-        if (element.tagName === 'A') {
+        if (element.tagName.toLowerCase() == 'a') {
             return this.processLink(element, directText);
         }
 
         return { nodeName: element.nodeName, text: directText, props: this.getProps(element) };
     }
 
-    findFirstNodeWithContent(node: TSummaryNode): TSummaryNode {
+    private findFirstNodeWithContent(node: TSummaryNode): TSummaryNode {
         if (!_.isEmpty(node.line.text) || !_.isEmpty(node.line.props)) {
             return node;
         }
@@ -154,13 +154,13 @@ export class HtmlExtraction {
         throw new Error('impossible situation');
     }
 
-    processTagsRecursive(element: Element): TSummaryNode {
+    public processTagsRecursive(element: HTMLElement): TSummaryNode {
         const children = [] as TSummaryNode[];
         for (const child of element.childNodes) {
-            if (this.filterElement(child as Element)) {
+            if (this.filterElement(child as HTMLElement)) {
                 continue;
             }
-            const localChild = this.processTagsRecursive(child as Element);
+            const localChild = this.processTagsRecursive(child as HTMLElement);
             if (this.filterTSummaryNode(localChild)) {
                 continue;
             }

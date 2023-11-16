@@ -5,13 +5,14 @@ import fs from "fs";
 import path from "path";
 
 async function execute() {
-    const canadaLifeHTML = fs.readFileSync(path.resolve(__dirname, "../../src/test_resources/canada_life.html"), "utf8");
+    const canadaLifeHTML = fs.readFileSync(path.resolve(__dirname, "../../src/test_resources/make_a_claim.html"), "utf8");
     // create a JSDOM object from the HTML
     const dom = new JSDOM(canadaLifeHTML);
     const extractor = new HtmlExtraction();
     const summary = extractor.processTagsRecursive(dom.window.document.body);
     const result = printTagsRecursive(summary);
-    console.log(JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(summary, null, 2));
+    // console.log(JSON.stringify(result, null, 2));
 }
 
 execute();

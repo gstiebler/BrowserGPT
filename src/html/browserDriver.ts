@@ -15,9 +15,8 @@ export function setInputValue(id: string, value: string, extractor?: HtmlExtract
     if (!extractor) {
         throw Error('localExtractor is not defined');
     }
-    const realId = extractor.getRealId(id);
-    const input = document.getElementById(realId) as HTMLInputElement;
-    console.log(`Setting the value ${value} to the input ${realId}`);
+    const input = extractor.getElementFromId(id) as HTMLInputElement;
+    console.log(`Setting the value ${value} to the input ${id}`);
     input.value = value;
 }
 
@@ -30,8 +29,7 @@ export function clickButton(id: string, extractor?: HtmlExtraction) {
     if (!extractor) {
         throw Error('localExtractor is not defined');
     }
-    const realId = extractor.getRealId(id);
-    const button = document.getElementById(realId) as HTMLButtonElement;
-    console.log(`Clicking the button ${realId}`);
+    const button = extractor.getElementFromId(id) as HTMLButtonElement;
+    console.log(`Clicking the button ${id}`);
     button.click();
 }

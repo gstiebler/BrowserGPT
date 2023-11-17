@@ -2,6 +2,7 @@ import _ from "lodash";
 
 // define the type TLine
 type TLine = {
+    element: HTMLElement;
     nodeName: string;
     text?: string;
     props?: { [key: string]: any };
@@ -63,16 +64,16 @@ export function printTagsRecursive(node: TSummaryNode): any {
 }
 
 export class HtmlExtraction {
-    keyMap = {} as _.Dictionary<HTMLElement>;
+    keyMap = new Map<string, HTMLElement>();
 
     forbiddenProps = new Set(["meta", "script", "style"]);
 
     inputShowProps = new Set(["type", "placeholder", "aria-label", "value"]);
     alwaysShowTags = new Set(['input', 'textarea', 'select']);
 
-    public getElementFromId = (id: string): HTMLElement => this.keyMap[id];
+    public getElementFromId = (id: string): HTMLElement | undefined => this.keyMap.get(id);
 
-    private processLink(element: Element, directText?: string): TLine {
+    private processLink(element: HTMLElement, directText?: string): TLine {
         const inputProps = {
             type: 'link',
             href: element.getAttribute('href'),
@@ -81,13 +82,13 @@ export class HtmlExtraction {
             inputProps.text = directText;
         }
 
-        return { nodeName: 'link', text: directText, props: inputProps };
+        return { nodeName: 'link', text: directText, props: inputProps, element };
     }
 
     private addId(element: HTMLElement): string {
-        const idIndex = this.keyMap.length;
+        const idIndex = this.keyMap.size;
         const newId = `id${idIndex}`;
-        this.keyMap[newId] = element;
+        this.keyMap.set(newId, element);
         return newId
     }
 
@@ -125,7 +126,7 @@ export class HtmlExtraction {
         return isButton || shownTag;
     }
 
-    private filterTSummaryNode(node: TSummaryNode): boolean {
+    private invalidTSummaryNode(node: TSummaryNode): boolean {
         if (_.isEmpty(node.line.props)) {
             return _.isEmpty(node.line.text) && _.isEmpty(node.children);
         } else {
@@ -134,7 +135,8 @@ export class HtmlExtraction {
             if (!isLink) { 
                 return false;
             }
-            return !(isLink || hasText);
+            const isButton = node.line.nodeName.toLowerCase() === 'button';
+            return !(isLink || hasText) || (isButton && !hasText);
         }
     }
 
@@ -142,8 +144,6 @@ export class HtmlExtraction {
         const inputProps = this.getFilteredProps(element);
         inputProps.type = this.getElementType(element);
         const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
-
-        element.id = this.addId(element);
         
         return filteredInputProps;
     }
@@ -155,7 +155,12 @@ export class HtmlExtraction {
             return this.processLink(element, directText);
         }
         const props = this.shouldProcessElement(element) ? this.getProps(element) : undefined;
-        return { nodeName: element.nodeName, text: directText, props };
+
+        if (props) {
+            props.id = this.addId(element);
+        }
+
+        return { nodeName: element.nodeName, text: directText, props, element };
     }
 
     private findFirstNodeWithContent(node: TSummaryNode): TSummaryNode {
@@ -179,7 +184,7 @@ export class HtmlExtraction {
                 continue;
             }
             const localChild = this.processTagsRecursive(child as HTMLElement);
-            if (this.filterTSummaryNode(localChild)) {
+            if (this.invalidTSummaryNode(localChild)) {
                 continue;
             }
             const firstNodeWithContent = this.findFirstNodeWithContent(localChild);

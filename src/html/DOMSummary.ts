@@ -104,7 +104,7 @@ export class HtmlExtraction {
     }
 
     private getElementType(element: HTMLElement): string | undefined {
-        return element.getAttribute ? (element.getAttribute('type') || element.nodeName) : undefined;
+        return element.nodeName || (element.getAttribute ? element.getAttribute('type') || undefined : undefined);
     }
 
     private shouldProcessChildren(element: HTMLElement): boolean {
@@ -119,10 +119,10 @@ export class HtmlExtraction {
     }
 
     private shouldProcessElement(element: HTMLElement): boolean {
-        const isSubmitButton = element.tagName?.toLowerCase() === 'button' && 
-            (element as any).type?.toLowerCase() === 'submit';
+        const type = this.getElementType(element)?.toLowerCase();
+        const isButton = type === 'button';
         const shownTag = this.alwaysShowTags.has(element.tagName?.toLowerCase());
-        return isSubmitButton || shownTag;
+        return isButton || shownTag;
     }
 
     private filterTSummaryNode(node: TSummaryNode): boolean {
@@ -162,7 +162,8 @@ export class HtmlExtraction {
         if (!_.isEmpty(node.line.text) || !_.isEmpty(node.line.props)) {
             return node;
         }
-        if (node.children.length > 1) {
+        const isButton = node.line.nodeName.toLowerCase() === 'button';
+        if (node.children.length > 1 || isButton) {
             return node;
         }
         if (node.children.length === 1) {

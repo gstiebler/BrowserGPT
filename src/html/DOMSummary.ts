@@ -68,7 +68,7 @@ export class HtmlExtraction {
 
     forbiddenProps = new Set(["meta", "script", "style"]);
 
-    inputShowProps = new Set(["type", "placeholder", "aria-label", "value"]);
+    inputShowProps = new Set(["type", "placeholder", "value", "role"]);
     alwaysShowTags = new Set(['input', 'textarea', 'select']);
 
     public getElementFromId = (id: string): HTMLElement | undefined => this.keyMap.get(id);
@@ -92,8 +92,13 @@ export class HtmlExtraction {
         return newId
     }
 
+    private includeProp(prop: string): boolean {
+        return true;
+        // return this.inputShowProps.has(prop.toLowerCase()) || prop.toLowerCase().startsWith('aria-');
+    }
+
     private getFilteredProps(element: Element): { [key: string]: any } {
-        const attributeNames = element.getAttributeNames();
+        const attributeNames = element.getAttributeNames ? element.getAttributeNames() : [];
         const allInputProps = attributeNames.reduce((acc, name) => {
             return {
                 ...acc,
@@ -101,7 +106,7 @@ export class HtmlExtraction {
             };
         }, {} as { [key: string]: any });
         // return only the props we want
-        return _.pickBy(allInputProps, prop => this.inputShowProps.has(prop.toLowerCase()));
+        return _.pickBy(allInputProps, prop => this.includeProp(prop));
     }
 
     private getElementType(element: HTMLElement): string | undefined {
@@ -142,7 +147,7 @@ export class HtmlExtraction {
 
     private getProps(element: HTMLElement): _.Dictionary<string> {
         const inputProps = this.getFilteredProps(element);
-        inputProps.type = this.getElementType(element);
+        // inputProps.type = this.getElementType(element);
         const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
         
         return filteredInputProps;
@@ -154,7 +159,7 @@ export class HtmlExtraction {
         if (element.tagName?.toLowerCase() == 'a') {
             return this.processLink(element, directText);
         }
-        const props = this.shouldProcessElement(element) ? this.getProps(element) : undefined;
+        const props = this.getProps(element);
 
         if (props) {
             props.id = this.addId(element);
@@ -191,5 +196,11 @@ export class HtmlExtraction {
             children.push(firstNodeWithContent);
         }
         return { line: this.elementToTLine(element), children };
+    }
+
+    public htmlToJsonRecursive(element: HTMLElement): any {
+        const children = [...element.childNodes].map(child => this.htmlToJsonRecursive(child as HTMLElement));
+        const props = this.getProps(element);
+        return { children, props, nodeName: element.nodeName, text: getImmediateTextContent(element) };
     }
 }

@@ -16,6 +16,14 @@ type TSummary = {
     summary: any;
     extractor: HtmlExtraction;
 }
+
+type TJsonElement = {
+    nodeName: string;
+    text?: string;
+    props?: { [key: string]: any };
+    children?: TJsonElement[];
+}
+
 export function summarize(document: Document): TSummary {
     const extractor = new HtmlExtraction();
     if (!document.body) {
@@ -66,9 +74,9 @@ export function printTagsRecursive(node: TSummaryNode): any {
 export class HtmlExtraction {
     keyMap = new Map<string, HTMLElement>();
 
-    forbiddenProps = new Set(["meta", "script", "style"]);
+    forbiddenProps = new Set(["meta", "script", "style", "#comment"]);
 
-    inputShowProps = new Set(["type", "placeholder", "value", "role"]);
+    inputShowProps = new Set(["type", "placeholder", "value", "role", "autocomplete", "href"]);
     alwaysShowTags = new Set(['input', 'textarea', 'select']);
 
     public getElementFromId = (id: string): HTMLElement | undefined => this.keyMap.get(id);
@@ -93,11 +101,12 @@ export class HtmlExtraction {
     }
 
     private includeProp(prop: string): boolean {
-        return true;
-        // return this.inputShowProps.has(prop.toLowerCase()) || prop.toLowerCase().startsWith('aria-');
+        const isAria = prop.toLowerCase().startsWith('aria-');
+        const isData = prop.toLowerCase().startsWith('data-');
+        return this.inputShowProps.has(prop.toLowerCase()) || isAria || isData;
     }
 
-    private getFilteredProps(element: Element): { [key: string]: any } {
+    private getPropsPairs(element: Element): { [key: string]: any } {
         const attributeNames = element.getAttributeNames ? element.getAttributeNames() : [];
         const allInputProps = attributeNames.reduce((acc, name) => {
             return {
@@ -105,8 +114,7 @@ export class HtmlExtraction {
                 [name]: element.getAttribute(name),
             };
         }, {} as { [key: string]: any });
-        // return only the props we want
-        return _.pickBy(allInputProps, prop => this.includeProp(prop));
+        return allInputProps;
     }
 
     private getElementType(element: HTMLElement): string | undefined {
@@ -146,11 +154,12 @@ export class HtmlExtraction {
     }
 
     private getProps(element: HTMLElement): _.Dictionary<string> {
-        const inputProps = this.getFilteredProps(element);
+        let props = this.getPropsPairs(element);
+        // let props = _.pickBy(allInputProps, prop => this.includeProp(prop));
         // inputProps.type = this.getElementType(element);
-        const filteredInputProps = _.pickBy(inputProps, (value, key) => !_.isEmpty(value));
+        props = _.pickBy(props, (value, key) => !_.isEmpty(value));
         
-        return filteredInputProps;
+        return props;
     }
 
     private elementToTLine(element: HTMLElement): TLine {
@@ -197,10 +206,40 @@ export class HtmlExtraction {
         }
         return { line: this.elementToTLine(element), children };
     }
+    
+    private convertJsonElement(jsonElement: TJsonElement): TJsonElement | string {
+        const isText = jsonElement.nodeName === '#text';
+        if (isText) {
+            return jsonElement.text || '';
+        }
+        return jsonElement;
+    }
 
-    public htmlToJsonRecursive(element: HTMLElement): any {
-        const children = [...element.childNodes].map(child => this.htmlToJsonRecursive(child as HTMLElement));
+    public htmlToJsonRecursive(element: HTMLElement): TJsonElement | string | null {
+        if (this.forbiddenProps.has(element.nodeName?.toLowerCase())) {
+            return null;
+        }
+        const children = [...element.childNodes]
+            .map(child => this.htmlToJsonRecursive(child as HTMLElement))
+            .filter(Boolean)
         const props = this.getProps(element);
-        return { children, props, nodeName: element.nodeName, text: getImmediateTextContent(element) };
+        const text = getImmediateTextContent(element);
+        const jsonElement = { children, props, text };
+        const hasOneChild = children.length === 1;
+        
+        const filteredJsonElement = _.pickBy(jsonElement, (value, key) => !_.isEmpty(value));
+        if (_.isEmpty(filteredJsonElement)) {
+            return null;
+        }
+
+        if (_.isEmpty(props) && _.isEmpty(text) && hasOneChild) {
+            return children[0];
+        }
+
+        if (hasOneChild && children[0] === text) {
+            delete filteredJsonElement.children;
+        }
+
+        return this.convertJsonElement({ ...filteredJsonElement, nodeName: element.nodeName });
     }
 }

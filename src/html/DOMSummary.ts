@@ -76,7 +76,7 @@ export class HtmlExtraction {
 
     forbiddenProps = new Set(["meta", "script", "style", "#comment"]);
 
-    inputShowProps = new Set(["type", "placeholder", "value", "role", "autocomplete", "href"]);
+    inputShowProps = new Set(["type", "placeholder", "value", "role", "autocomplete", "href", "title"]);
     alwaysShowTags = new Set(['input', 'textarea', 'select']);
 
     public getElementFromId = (id: string): HTMLElement | undefined => this.keyMap.get(id);
@@ -101,9 +101,10 @@ export class HtmlExtraction {
     }
 
     private includeProp(prop: string): boolean {
-        const isAria = prop.toLowerCase().startsWith('aria-');
-        const isData = prop.toLowerCase().startsWith('data-');
-        return this.inputShowProps.has(prop.toLowerCase()) || isAria || isData;
+        const propLowerCase = prop.toLowerCase();
+        const isAria = propLowerCase.includes('aria-');
+        const isData = propLowerCase.includes('data-');
+        return this.inputShowProps.has(propLowerCase);
     }
 
     private getPropsPairs(element: Element): { [key: string]: any } {
@@ -132,13 +133,6 @@ export class HtmlExtraction {
         return !this.forbiddenProps.has(element.tagName?.toLowerCase());
     }
 
-    private shouldProcessElement(element: HTMLElement): boolean {
-        const type = this.getElementType(element)?.toLowerCase();
-        const isButton = type === 'button';
-        const shownTag = this.alwaysShowTags.has(element.tagName?.toLowerCase());
-        return isButton || shownTag;
-    }
-
     private invalidTSummaryNode(node: TSummaryNode): boolean {
         if (_.isEmpty(node.line.props)) {
             return _.isEmpty(node.line.text) && _.isEmpty(node.children);
@@ -155,7 +149,7 @@ export class HtmlExtraction {
 
     private getProps(element: HTMLElement): _.Dictionary<string> {
         let props = this.getPropsPairs(element);
-        // let props = _.pickBy(allInputProps, prop => this.includeProp(prop));
+        props = _.pickBy(props, (value, key) => this.includeProp(key));
         // inputProps.type = this.getElementType(element);
         props = _.pickBy(props, (value, key) => !_.isEmpty(value));
         
@@ -209,7 +203,7 @@ export class HtmlExtraction {
     
     private convertJsonElement(jsonElement: TJsonElement): TJsonElement | string {
         const isText = jsonElement.nodeName === '#text';
-        if (isText) {
+        if (isText && _.isEmpty(jsonElement.children)) {
             return jsonElement.text || '';
         }
         return jsonElement;
@@ -219,7 +213,8 @@ export class HtmlExtraction {
         if (this.forbiddenProps.has(element.nodeName?.toLowerCase())) {
             return null;
         }
-        const children = [...element.childNodes]
+        const childNodes = [...element.childNodes];
+        const children = childNodes
             .map(child => this.htmlToJsonRecursive(child as HTMLElement))
             .filter(Boolean)
         const props = this.getProps(element);

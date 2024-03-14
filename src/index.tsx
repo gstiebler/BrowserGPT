@@ -17,7 +17,6 @@ root.render(
     <GlobalStyles styles={{
       'html, body, #root': {
         height: '100%',
-        margin: 5,
       },
     }} />
     <CssBaseline />

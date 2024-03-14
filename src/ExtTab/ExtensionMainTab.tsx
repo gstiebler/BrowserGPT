@@ -39,9 +39,8 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
             <Grid item xs sx={{ display: 'flex' }} >
                 <Box sx={{ display: 'flex', flexDirection: 'column', pl: 3, pr: 3, width: '100%' }} >
                     <Typography variant="h6">Chat Log</Typography>
-
-                    <Box sx={{ width: '100%', height: '95%', display: 'flex', justifyContent: 'center', pb: 2 }} >
-                        <Paper elevation={1} sx={{ p: 1, height: '100%', width: '100%', overflow: 'auto' }}>
+                    <Box sx={{ width: '100%', height: '800px', display: 'flex', justifyContent: 'center', pb: 5, flexShrink: 0 }} >
+                        <Paper elevation={1} sx={{ p: 1, overflowY: 'scroll', height: '750px', width: '100%' }}>
                             {chatLog.map((entry, index) => (
                                 <Box key={index} mb={2} p={1} bgcolor={entry.role === 'user' ? '#e6f7ff' : '#f2f2f2'} textAlign={entry.role === 'user' ? 'right' : 'left'}>
                                     <Avatar>{entry.role === 'user' ? 'U' : 'S'}</Avatar>

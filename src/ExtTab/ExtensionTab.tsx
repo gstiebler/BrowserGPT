@@ -42,7 +42,7 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
 
         },
     };
-    
+
     const commandExtractor = { extractCommands, extractMessageToUser };
 
     const orquestrator = new Orquestrator(llm, htmlDoc, chat, promptSource, commandExtractor);
@@ -50,12 +50,30 @@ const getOrquestrator = (apiKey: string, chat: Chat): Orquestrator => {
 };
 
 const ExtensionTab: React.FC = () => {
-    const [apiKey, setApiKey] = useState(process.env.OPENAI_KEY ?? '');
+    const [apiKeyText, setApiKeyText] = useState('');
+    const [apiKey, setApiKey] = useState(null as string | null);
     const [chatMessage, setChatMessage] = useState(process.env.INITIAL_MESSAGE ?? '');
     const [chatLog, setChatLog] = useState<TChatItem[]>([]);
     const [orquestrator, setOrchestator] = useState<Orquestrator | null>(null);
 
+    const setAndSaveApiKey = (newApiKey: string) => {
+        localStorage.setItem('apiKey', newApiKey);
+        setApiKey(newApiKey);
+    }
+
+
     useEffect(() => {
+        const storedApiKey = localStorage.getItem('apiKey');
+        if (storedApiKey) {
+            setApiKey(storedApiKey);
+        }
+    }, []);
+
+
+    useEffect(() => {
+        if (!apiKey) {
+            return;
+        }
         const chat = {
             showMessages: (messages: ChatMessage[]) => {
                 setChatLog(messages);
@@ -81,18 +99,26 @@ const ExtensionTab: React.FC = () => {
         setChatMessage('');
     };
 
-    return (
-        <ExtensionMainTab
-          apiKey={apiKey}
-          setApiKey={setApiKey}
-          chatLog={chatLog}
-          chatMessage={chatMessage}
-          setChatMessage={setChatMessage}
-          handleSendMessage={handleSendMessage}
-          printHtml={() => sendMessageToUserTab({ command: printHtmlMsg })}
-          reloadHtml={() => sendMessageToUserTab({ command: reloadHtmlMsg })}
-        />
-    );
+    if (apiKey) {
+        return (
+            <ExtensionMainTab
+                chatLog={chatLog}
+                chatMessage={chatMessage}
+                setChatMessage={setChatMessage}
+                handleSendMessage={handleSendMessage}
+                printHtml={() => sendMessageToUserTab({ command: printHtmlMsg })}
+                reloadHtml={() => sendMessageToUserTab({ command: reloadHtmlMsg })}
+            />
+        );
+    } else {
+        return (
+            <div>
+                <h1>Set API Key</h1>
+                <input type="text" value={apiKeyText ?? ''} onChange={(e) => setApiKeyText(e.target.value)} />
+                <button onClick={() => setAndSaveApiKey(apiKeyText)}>Confirm</button>
+            </div>
+        );
+    }
 };
 
 export default ExtensionTab;

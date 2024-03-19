@@ -30,7 +30,7 @@ export function summarize(document: Document): TSummary {
         throw new Error('Document body is empty');
     }
     const result = extractor.processTagsRecursive(document.body);
-    console.log(JSON.stringify(result, null, 2));
+    // console.log(JSON.stringify(result, null, 2));
     const summary = printTagsRecursive(result);
     return { summary, extractor };
 }
@@ -55,15 +55,16 @@ function getImmediateTextContent(node: Element): string | null {
 export function printTagsRecursive(node: TSummaryNode): any {
     const { line, children } = node;
     const { nodeName, text, props } = line;
-    if (children.length === 0) {
-        const propsWithoutId = _.omit(props, 'id');
-        const shouldShow = !_.isEmpty(propsWithoutId) || !_.isEmpty(text) || nodeName === 'link';
-        return shouldShow ? { ...props, text } : undefined;
-    } else if (children.length === 1) {
-        return printTagsRecursive(children[0]);
-    } else {
-        return children.map(printTagsRecursive).filter(i => !_.isEmpty(i));
+
+    const convertedChildren = children.map(printTagsRecursive).filter(i => !_.isEmpty(i));
+    const propsWithoutId = _.omit(props, 'id', 'role');
+    const shouldShow = !_.isEmpty(propsWithoutId) || !_.isEmpty(text) || nodeName === 'link';
+
+    const result = convertedChildren;
+    if (shouldShow) {
+        result.push({ ...props, text });
     }
+    return result.length === 1 ? result[0] : result;
 }
 
 export class HtmlExtraction {

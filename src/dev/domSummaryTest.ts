@@ -35,6 +35,14 @@ async function printJson() {
     console.log(JSON.stringify(json, null, 2));
 }
 
+function printPrintTags() {
+    const resPath = path.resolve(__dirname, "../test_resources/uber_eats.json");
+    const googleContent = fs.readFileSync(resPath, "utf8");
+    const googleJson = JSON.parse(googleContent);
+    const result = printTagsRecursive(googleJson);
+    console.log(JSON.stringify(result, null, 2));
+}
+
 function measureTime(fn: () => void): void {
     const start = new Date().getTime();
     const result = fn();
@@ -44,4 +52,4 @@ function measureTime(fn: () => void): void {
 }
 
 
-printJson();
+printPrintTags();

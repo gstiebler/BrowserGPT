@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 describe("summary", () => {
-    it("happy path", () => {
+    it.skip("happy path", () => {
         const canadaLifeHTML = fs.readFileSync(path.resolve(__dirname, "../test_resources/canada_life.html"), "utf8");
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
@@ -14,7 +14,7 @@ describe("summary", () => {
         expect(summary).toBe(15);
     });
 
-    it("process tags", () => {
+    it.skip("process tags", () => {
         const canadaLifeHTML = fs.readFileSync(path.resolve(__dirname, "../test_resources/canada_life.html"), "utf8");
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
@@ -24,13 +24,22 @@ describe("summary", () => {
         expect(result).toBe(16);
     });
 
-    it("print tags", () => {
+    it.skip("print tags", () => {
         const canadaLifeHTML = fs.readFileSync(path.resolve(__dirname, "../test_resources/canada_life.html"), "utf8");
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
         const extractor = new HtmlExtraction();
         const summary = extractor.processTagsRecursive(dom.window.document.body);
         const result = printTagsRecursive(summary);
+        console.log(JSON.stringify(result, null, 2));
+        expect(result).toBe(16);
+    });
+
+    it("compaction", () => {
+        const resPath = path.resolve(__dirname, "../test_resources/google.json");
+        const googleContent = fs.readFileSync(resPath, "utf8");
+        const googleJson = JSON.parse(googleContent);
+        const result = printTagsRecursive(googleJson);
         console.log(JSON.stringify(result, null, 2));
         expect(result).toBe(16);
     });

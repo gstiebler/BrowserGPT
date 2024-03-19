@@ -1,10 +1,11 @@
 import React from 'react';
-import { TextField, Button, Typography, Paper, Box, Avatar } from '@mui/material';
+import { TextField, Button, Typography, Paper, Box, Avatar, CircularProgress } from '@mui/material';
 import { TChatItem } from './types';
 
 interface ExtensionMainTabProps {
     chatLog: TChatItem[];
     chatMessage: string;
+    flowState: 'idle' | 'waiting';
     setChatMessage: (newMessage: string) => void;
     handleSendMessage: () => void;
     printHtml: () => void;
@@ -14,6 +15,7 @@ interface ExtensionMainTabProps {
 const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
     chatLog,
     chatMessage,
+    flowState,
     setChatMessage,
     handleSendMessage,
     printHtml,
@@ -49,13 +51,20 @@ const ExtensionMainTab: React.FC<ExtensionMainTabProps> = ({
                 </Button>
             </Box>
             <Box sx={{ pl: 3, pb: 2 }}>
-                <Button variant="contained" color="primary" onClick={reloadHtml} sx={{ mr: 2 }} >
-                    Reload HTML
-                </Button>
-
-                <Button variant="contained" color="primary" onClick={printHtml}>
-                    Print HTML
-                </Button>
+                {flowState === 'waiting' ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', pb: 2 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <>
+                        <Button variant="contained" color="primary" onClick={reloadHtml} sx={{ mr: 2 }} >
+                            Reload HTML
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={printHtml}>
+                            Print HTML
+                        </Button>
+                    </>
+                )}
             </Box>
         </Box>
     );

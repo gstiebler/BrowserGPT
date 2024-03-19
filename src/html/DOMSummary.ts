@@ -30,6 +30,7 @@ export function summarize(document: Document): TSummary {
         throw new Error('Document body is empty');
     }
     const result = extractor.processTagsRecursive(document.body);
+    console.log(JSON.stringify(result, null, 2));
     const summary = printTagsRecursive(result);
     return { summary, extractor };
 }
@@ -54,21 +55,15 @@ function getImmediateTextContent(node: Element): string | null {
 export function printTagsRecursive(node: TSummaryNode): any {
     const { line, children } = node;
     const { nodeName, text, props } = line;
-    if (!_.isEmpty(props)) {
-        const expandedChildren = children.length > 0 ? children.map(printTagsRecursive) : undefined;
-        const firstexpandedChild = expandedChildren?.[0];
-        const hasOneTextChild = children.length === 1 && _.isEmpty(firstexpandedChild?.line?.props?.text);
-        if (hasOneTextChild) {
-            const singleChildText = children[0].line.text;
-            return { ...props, text: singleChildText };
-        } else {
-            return props;
-        }
+    if (children.length === 0) {
+        const propsWithoutId = _.omit(props, 'id');
+        const shouldShow = !_.isEmpty(propsWithoutId) || !_.isEmpty(text) || nodeName === 'link';
+        return shouldShow ? { ...props, text } : undefined;
+    } else if (children.length === 1) {
+        return printTagsRecursive(children[0]);
+    } else {
+        return children.map(printTagsRecursive).filter(i => !_.isEmpty(i));
     }
-    if (!_.isEmpty(text)) {
-        return text;
-    }
-    return children.map(printTagsRecursive);
 }
 
 export class HtmlExtraction {
@@ -122,15 +117,17 @@ export class HtmlExtraction {
         return element.nodeName || (element.getAttribute ? element.getAttribute('type') || undefined : undefined);
     }
 
-    private shouldProcessChildren(element: HTMLElement): boolean {
+    private isElementVisible(element: HTMLElement): boolean {
         const type = this.getElementType(element)?.toLowerCase();
         const isHidden = type === 'hidden';
-        const isComment = element.nodeName === '#comment' || type === '#comment';
-        if (isHidden || isComment) {
-            return false;
-        }
+        const bounds = element.getBoundingClientRect ? element.getBoundingClientRect() : undefined;
+        return !isHidden && Boolean(bounds?.width && bounds?.height);
+    }
 
-        return !this.forbiddenProps.has(element.tagName?.toLowerCase());
+    private shouldProcessElement(element: HTMLElement): boolean {
+        const type = this.getElementType(element)?.toLowerCase();
+        const isComment = element.nodeName === '#comment' || type === '#comment';
+        return !isComment && this.isElementVisible(element) && !this.forbiddenProps.has(element.tagName?.toLowerCase());
     }
 
     private invalidTSummaryNode(node: TSummaryNode): boolean {
@@ -188,7 +185,7 @@ export class HtmlExtraction {
     public processTagsRecursive(element: HTMLElement): TSummaryNode {
         const children = [] as TSummaryNode[];
         for (const child of element.childNodes) {
-            if (!this.shouldProcessChildren(child as HTMLElement)) {
+            if (!this.shouldProcessElement(child as HTMLElement)) {
                 continue;
             }
             const localChild = this.processTagsRecursive(child as HTMLElement);

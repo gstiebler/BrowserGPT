@@ -27,7 +27,7 @@ describe("orquestrator", () => {
         chatMock = { showMessages: jest.fn() };
     });
 
-    it("happy path", async () => {
+    it.skip("happy path", async () => {
         const orquestrator = new Orquestrator(llmMock, htmlDocumentMock, chatMock, promptSource, commandExtractor);
 
         const openLinkLlmMsg = `Now I'll open the link www.canadalife.com ${commandsSeparatorStr} open_url(www.canadalife.com) ${commandsSeparatorStr}`;

@@ -6,6 +6,8 @@ import { promptSource } from '../ai/promptSource';
 import { TChatItem } from './types';
 import ExtensionMainTab from './ExtensionMainTab';
 import { clickButtonMsg, htmlDocumentChangedMsg, openLinkMsg, printHtmlMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 async function sendMessageToUserTab(payload: any) {
@@ -55,6 +57,7 @@ const ExtensionTab: React.FC = () => {
     const [chatMessage, setChatMessage] = useState(process.env.INITIAL_MESSAGE ?? '');
     const [chatLog, setChatLog] = useState<TChatItem[]>([]);
     const [orquestrator, setOrchestator] = useState<Orquestrator | null>(null);
+    const [flowState, setFlowState] = useState('idle' as 'idle' | 'waiting');
 
     const setAndSaveApiKey = (newApiKey: string) => {
         localStorage.setItem('apiKey', newApiKey);
@@ -76,6 +79,7 @@ const ExtensionTab: React.FC = () => {
         }
         const chat = {
             showMessages: (messages: ChatMessage[]) => {
+                setFlowState('idle');
                 setChatLog(messages);
             },
         }
@@ -95,7 +99,14 @@ const ExtensionTab: React.FC = () => {
         if (!chatMessage) {
             return;
         }
-        orquestrator?.userMessageArrived(chatMessage);
+        try {
+            setFlowState('waiting');
+            await orquestrator?.userMessageArrived(chatMessage);
+        } catch (e: any) {
+            setFlowState('idle');
+            toast.error(e.message);
+            console.error(e);
+        }
         setChatMessage('');
     };
 
@@ -104,6 +115,7 @@ const ExtensionTab: React.FC = () => {
             <ExtensionMainTab
                 chatLog={chatLog}
                 chatMessage={chatMessage}
+                flowState={flowState}
                 setChatMessage={setChatMessage}
                 handleSendMessage={handleSendMessage}
                 printHtml={() => sendMessageToUserTab({ command: printHtmlMsg })}

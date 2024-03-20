@@ -11,4 +11,19 @@ BrowserGPT uses LLMs APIs to control your browser and perform repetitive actions
 6. Navigate to chrome://extensions/
 7. Toggle Developer mode
 8. Click on Load unpacked extension
-9. Select the build folder that `npm start` generated
+9. Select the build folder that `npm run build` generated
+
+## Developing
+
+### Testing the conversion from visible nodes to useful nodes
+1. Open a web page
+2. Open the extension
+3. Click on "Print HTML"
+4. From the DevTools, copy the result in the log to `visibleNodes.json`
+5. Run
+```
+npx ts-node src/dev/domSummaryTest.ts >& usefulNodes.json
+```
+
+### Debugging the extension side code
+Chrome DevTools: Go to `chrome://extensions`, enable "Developer mode", and click "Inspect views background page" under the extension. This opens a dedicated DevTools window for the background script.

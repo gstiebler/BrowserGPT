@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { clickButton, getSummarizedHtmlFromDocument, openLink, setInputValue } from '../html/browserDriver';
-import { HtmlExtraction } from '../html/DOMSummary';
 import { clickButtonMsg, htmlDocumentChangedMsg, openLinkMsg, printHtmlMsg, reloadHtmlMsg, setInputValueMsg } from '../constants';
+import { HtmlExtraction } from '../html/HTMLExtraction';
 
 
 console.log('Yes, it opened');

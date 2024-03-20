@@ -16,18 +16,75 @@
             ],
             "type": "node"
         },
-
         {
-            "type": "node",
+            "name": "Run HTML to JSON",
             "request": "launch",
-            "name": "Launch Program",
+            "runtimeArgs": [
+                "run",
+                "html_to_json",
+                "src/test_resources/canada_life.html"
+            ],
+            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/src/gpt/DOMSummary.ts",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
+            "type": "node"
+        },
+        {
+            "name": "Run HTML to visible nodes",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "html_to_visible_nodes",
+                "src/test_resources/canada_life.html"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "Run HTML to visible properties",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "html_to_visible_properties",
+                "src/test_resources/canada_life.html"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "Run HTML to useful nodes",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "html_to_useful_nodes",
+                "src/test_resources/canada_life.html"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "Run HTML to Summary",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "html_to_summary",
+                "health_professional"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
         }
     ]
 }

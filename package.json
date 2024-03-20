@@ -26,8 +26,8 @@
     "start": "react-scripts start",
     "build": "INLINE_RUNTIME_CHUNK=false craco build",
     "test": "CI=true react-scripts test",
-    "prompt_test": "tsc && node dist/dev/promptTest.js",
     "dom_summary_test": "npx ts-node src/dev/domSummaryTest.ts",
+    "html_to_summary": "npx ts-node src/dev/htmlToSummary.ts",
     "pdf_test": "tsc && node dist/dev/pdfTest.js",
     "eject": "react-scripts eject"
   },

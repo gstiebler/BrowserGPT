@@ -1,11 +1,14 @@
-import { summarize, HtmlExtraction } from "./DOMSummary";
+import { summarize } from "./DOMSummary";
+import { nodeToObject } from "./DomToJson";
+import { HtmlExtraction } from "./HTMLExtraction";
 
 type TSummarizedHtml = {
     summary: any;
     extractor: HtmlExtraction;
 }
 export function getSummarizedHtmlFromDocument(): TSummarizedHtml {
-    const { summary, extractor } = summarize(document);
+    const jsonHtml = nodeToObject(document);
+    const { summary, extractor } = summarize(jsonHtml);
     console.log('Summary');
     console.log(summary);
     return { summary, extractor };

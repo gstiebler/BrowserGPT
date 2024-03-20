@@ -3,10 +3,12 @@ import { commandsSeparatorStr, extractCommands, extractMessageToUser,  } from ".
 import { Chat, HTMLDoc, LLM, Orquestrator } from "./orquestrator";
 import { summarize } from "../html/DOMSummary";
 import { promptSource } from "../ai/promptSource";
+import { nodeToObject } from "../html/DomToJson";
 
 function summarizeHtml(html: string): string {
     const loginPageDocument = new JSDOM(html).window.document;
-    const { summary, extractor } = summarize(loginPageDocument);
+    const jsonHtml = nodeToObject(loginPageDocument);
+    const { summary, extractor } = summarize(jsonHtml);
     return summary;
 }
 

@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { HtmlJsonNode, isNodePropsJsonNode, PropsJsonNode } from "./DomToJson";
 
+const usefulTypes = new Set(["input", "textarea", "select", "button"]);
+
 function removeEmptyPropertiesRecursive(htmlJsonNode: HtmlJsonNode): Partial<HtmlJsonNode> {
     const propsNode = htmlJsonNode as PropsJsonNode;
     if (!isNodePropsJsonNode(propsNode)) {
@@ -9,12 +11,13 @@ function removeEmptyPropertiesRecursive(htmlJsonNode: HtmlJsonNode): Partial<Htm
 
     const { rect, nodeName, ...otherProps } = propsNode;
     const children = propsNode.children.map(removeEmptyPropertiesRecursive);
+    const isTypeUseful = usefulTypes.has(nodeName?.toLowerCase());
     return {
         ...otherProps,
         id: _.isEmpty(propsNode.id) ? undefined : propsNode.id,
         value: _.isEmpty(propsNode.value) ? undefined : propsNode.value,
         attributes: _.isEmpty(propsNode.attributes) ? undefined : propsNode.attributes,
-        nodeName: _.isEmpty(nodeName) ? undefined : nodeName,
+        nodeName: !isTypeUseful ? undefined : nodeName,
         children: _.isEmpty(children) ? undefined : children as HtmlJsonNode[], // little hack to make TypeScript happy
     };
 }

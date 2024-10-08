@@ -1,14 +1,6 @@
 import _ from "lodash";
 import { HtmlJsonNode } from "./DomToJson";
-
-function getNonEmptyProperties(obj: any) {
-    return Object.entries(obj)
-        .filter(([key, value]) => !_.isEmpty(value))
-        .reduce((acc, [key, value]) => {
-            acc[key] = value;
-            return acc;
-        }, {} as { [key: string]: any });
-}
+import { getNonEmptyProperties } from "./util";
 
 const textProperties = new Set(["text", "content", "aria-label", "alt", "title"]);
 

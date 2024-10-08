@@ -14,6 +14,7 @@ function removeEmptyPropertiesRecursive(htmlJsonNode: HtmlJsonNode): Partial<Htm
         id: _.isEmpty(propsNode.id) ? undefined : propsNode.id,
         value: _.isEmpty(propsNode.value) ? undefined : propsNode.value,
         attributes: _.isEmpty(propsNode.attributes) ? undefined : propsNode.attributes,
+        nodeName: _.isEmpty(nodeName) ? undefined : nodeName,
         children: _.isEmpty(children) ? undefined : children as HtmlJsonNode[], // little hack to make TypeScript happy
     };
 }

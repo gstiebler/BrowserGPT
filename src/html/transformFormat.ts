@@ -16,10 +16,7 @@ function transformFormatRecursive(node: any): any {
         .map(transformFormatRecursive)
         .filter((child: any) => !_.isEmpty(child));
 
-    const { text, children, attributes, ...propsNode } = node;
-    if (_.isEmpty(propsNode) && _.isEmpty(processedChildren) && _.isEmpty(attributes) && !_.isEmpty(text)) {
-        return text;
-    }
+    const { children, attributes, ...propsNode } = node;
 
     const mainOutput = {
         ...propsNode,
@@ -27,7 +24,6 @@ function transformFormatRecursive(node: any): any {
     };
 
     const result = [
-        ...(_.isEmpty(text) ? [] : [text]),
         ...processedChildren
     ];
     const nonEmptyPropertyCount = countNonEmptyProperties(mainOutput);
@@ -39,6 +35,11 @@ function transformFormatRecursive(node: any): any {
         result.push(mainOutput);
     }
 
+    if (result.length === 1) {
+        if (_.isArray(result[0])) {
+            return result[0];
+        }
+    }
     return result;
 }
 

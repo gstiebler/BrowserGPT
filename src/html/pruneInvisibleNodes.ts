@@ -17,7 +17,6 @@ export function pruneInvisibleNodes(htmlJsonRootNode: HtmlJsonNode): HtmlJsonNod
         attributes: {},
         value: "",
         nodeName: "",
-        text: "",
         children: (htmlJsonRootNode as PropsJsonNode).children,
     });
 }

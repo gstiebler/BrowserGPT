@@ -20,7 +20,6 @@ function removeUselessPropertiesRecursive(htmlJsonNode: HtmlJsonNode): HtmlJsonN
         ...otherProps,
         id: cleanText(propsNode.id),
         value: cleanText(propsNode.value),
-        text: cleanText(propsNode.text),
         attributes: filterAttributes(propsNode.attributes),
         children: propsNode.children.map(removeUselessPropertiesRecursive),
     };

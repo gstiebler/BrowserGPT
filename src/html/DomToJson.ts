@@ -42,9 +42,8 @@ export function nodeToObject(node: Node): HtmlJsonNode {
     return {
         attributes: attributes,
         id: htmlNode.id,
-        value: htmlNode.nodeValue,
+        value: htmlNode.nodeValue ?? undefined,
         nodeName: htmlNode.nodeName,
-        text: '',
         rect: htmlNode.getBoundingClientRect ? htmlNode.getBoundingClientRect() : undefined,
         children: children,
     };
@@ -53,9 +52,8 @@ export function nodeToObject(node: Node): HtmlJsonNode {
 export type PropsJsonNode = {
     attributes: { [key: string]: string };
     id?: string;
-    value: string | null;
+    value?: string;
     nodeName: string;
-    text: string | null;
     children: HtmlJsonNode[];
     rect?: DOMRect;
 }

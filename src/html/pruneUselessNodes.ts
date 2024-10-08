@@ -20,9 +20,8 @@ export function pruneUselessNodes(htmlJsonNode: HtmlJsonNode): HtmlJsonNode {
     const hasUsefulProperties = Object.keys(propsNode?.attributes ?? {}).some((key) => usefulAttributes.has(key) ||  interestingAriaProps.has(key));
     const isUsefulType = usefulTypes.has(propsNode?.nodeName ?? "");
     const usefulChildren = (propsNode.children?.map(pruneUselessNodes).filter((node) => node !== null && !_.isEmpty(node)) ?? []) as HtmlJsonNode[];
-    const hasText = !_.isEmpty(propsNode.text?.trim());
     if (usefulChildren.length === 0) {
-        return hasUsefulProperties || isUsefulType || hasText ? htmlJsonNode : "";
+        return hasUsefulProperties || isUsefulType ? htmlJsonNode : "";
     } else if (usefulChildren.length === 1) {
         return pruneUselessNodes(usefulChildren[0]);
     } else {

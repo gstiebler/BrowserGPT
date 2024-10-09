@@ -23,14 +23,12 @@ export function pruneUselessNodes(htmlJsonNode: HtmlJsonNode): HtmlJsonNode {
             ...propsNode,
             ...propsNode.attributes,
         });
-        const hasUsefulProperties = Object.keys(combined ?? {}).some((key) => usefulAttributes.has(key) ||  interestingAriaProps.has(key));
+        const hasUsefulProperties = Object.keys(combined ?? {}).some((key) => usefulAttributes.has(key) || interestingAriaProps.has(key));
         return hasUsefulProperties ? htmlJsonNode : "";
-    } else if (usefulChildren.length === 1) {
-        return pruneUselessNodes(usefulChildren[0]);
-    } else {
-        return {
-            ...htmlJsonNode,
-            children: usefulChildren,
-        };
     }
+
+    return {
+        ...htmlJsonNode,
+        children: usefulChildren,
+    };
 }

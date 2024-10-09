@@ -1,9 +1,7 @@
 import _ from "lodash";
 import { cleanText } from "../util";
 import { HtmlJsonNode, isNodePropsJsonNode, PropsJsonNode } from "./DomToJson";
-
-const interestingProps = new Set(["role", "type", "placeholder", "value", "href", "title", "id"]);
-export const interestingAriaProps = new Set(["aria-label", "aria-labelledby", "aria-describedby", "aria-details", "aria-placeholder", "aria-roledescription", "aria-valuetext"]);
+import { interestingAriaProps, interestingProps } from "./util";
 
 function filterAttributes(attributes: { [key: string]: string }): { [key: string]: string } {
     return _.pickBy(attributes, (value, key) => interestingProps.has(key) || interestingAriaProps.has(key));

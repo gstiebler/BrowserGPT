@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { HtmlJsonNode, isNodePropsJsonNode, PropsJsonNode } from "./DomToJson";
-
-const usefulTypes = new Set(["input", "textarea", "select", "button"]);
+import { usefulTypes } from "./util";
 
 function removeEmptyPropertiesRecursive(htmlJsonNode: HtmlJsonNode): Partial<HtmlJsonNode> {
     const propsNode = htmlJsonNode as PropsJsonNode;

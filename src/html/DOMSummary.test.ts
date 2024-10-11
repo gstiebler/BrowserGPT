@@ -11,7 +11,7 @@ describe("summary", () => {
         // create a JSDOM object from the HTML
         const dom = new JSDOM(canadaLifeHTML);
         const jsonHtml = nodeToObject(dom.window.document);
-        const { summary, extractor } = summarize(jsonHtml);
+        const summary = summarize(jsonHtml);
         console.log(summary);
         expect(summary).toBe(15);
     });

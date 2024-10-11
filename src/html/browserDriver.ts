@@ -1,24 +1,16 @@
 import { summarize } from "./DOMSummary";
-import { nodeToObject } from "./DomToJson";
-import { HtmlExtraction } from "./HTMLExtraction";
+import { HtmlJsonNode, nodeToObject } from "./DomToJson";
 
-type TSummarizedHtml = {
-    summary: any;
-    extractor: HtmlExtraction;
-}
-export function getSummarizedHtmlFromDocument(): TSummarizedHtml {
+export function getSummarizedHtmlFromDocument(): HtmlJsonNode {
     const jsonHtml = nodeToObject(document);
-    const { summary, extractor } = summarize(jsonHtml);
+    const summary = summarize(jsonHtml);
     console.log('Summary');
     console.log(summary);
-    return { summary, extractor };
+    return summary;
 }
 
-export function setInputValue(id: string, value: string, extractor?: HtmlExtraction) {
-    if (!extractor) {
-        throw Error('localExtractor is not defined');
-    }
-    const input = extractor.getElementFromId(id) as HTMLInputElement;
+export function setInputValue(id: string, value: string) {
+    const input = document.getElementById(id) as HTMLInputElement
     console.log(`Setting the value ${value} to the input ${id}`);
     input.value = value;
 }
@@ -28,11 +20,8 @@ export function openLink(url: string) {
     window.location.href = url;
 }
 
-export function clickButton(id: string, extractor?: HtmlExtraction) {
-    if (!extractor) {
-        throw Error('localExtractor is not defined');
-    }
-    const button = extractor.getElementFromId(id) as HTMLButtonElement;
+export function clickButton(id: string) {
+    const button = document.getElementById(id) as HTMLInputElement
     console.log(`Clicking the button ${id}`);
     button.click();
 }

@@ -8,8 +8,8 @@ import { nodeToObject } from "../html/DomToJson";
 function summarizeHtml(html: string): string {
     const loginPageDocument = new JSDOM(html).window.document;
     const jsonHtml = nodeToObject(loginPageDocument);
-    const { summary, extractor } = summarize(jsonHtml);
-    return summary;
+    const summary = summarize(jsonHtml);
+    return JSON.stringify(summary, null, 1);
 }
 
 describe("orquestrator", () => {

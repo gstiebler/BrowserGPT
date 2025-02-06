@@ -5,7 +5,9 @@ export const usefulTypes = new Set(["input", "textarea", "select", "button"]);
 
 export const usefulAttributes = new Set(["text", "value", "title", "placeholder"]);
 export const interestingProps = new Set(["role", "type", "placeholder", "value", "href", "title", "id"]);
-export const interestingAriaProps = new Set(["aria-label", "aria-labelledby", "aria-describedby", "aria-details", "aria-placeholder", "aria-roledescription", "aria-valuetext"]);
+const interestingAriaProps = new Set(["aria-label", "aria-labelledby", "aria-describedby", "aria-details", "aria-placeholder", "aria-roledescription", "aria-valuetext"]);
+
+export const isInterestingAriaProp = (key: string) => interestingAriaProps.has(key);
 
 export function getNonEmptyProperties(obj: any) {
     return Object.entries(obj)

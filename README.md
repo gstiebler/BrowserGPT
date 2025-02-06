@@ -22,7 +22,7 @@ BrowserGPT uses LLMs APIs to control your browser and perform repetitive actions
 4. From the DevTools, copy the result in the log to `visibleNodes.json`
 5. Run
 ```
-npx ts-node src/dev/domSummaryTest.ts >& usefulNodes.json
+npm run html_to_summary <HTML file at ./dev/testresources/>
 ```
 
 ### Debugging the extension side code

@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { HtmlJsonNode, isNodePropsJsonNode, PropsJsonNode } from "./DomToJson";
-import { forbiddenTypes, getNonEmptyProperties, interestingAriaProps, usefulAttributes } from "./util";
+import { forbiddenTypes, getNonEmptyProperties, isInterestingAriaProp, usefulAttributes } from "./util";
 
 export function pruneUselessNodes(htmlJsonNode: HtmlJsonNode): HtmlJsonNode {
     const propsNode = htmlJsonNode as PropsJsonNode;
@@ -20,7 +20,7 @@ export function pruneUselessNodes(htmlJsonNode: HtmlJsonNode): HtmlJsonNode {
             ...propsNode,
             ...propsNode.attributes,
         });
-        const hasUsefulProperties = Object.keys(combined ?? {}).some((key) => usefulAttributes.has(key) || interestingAriaProps.has(key));
+        const hasUsefulProperties = Object.keys(combined ?? {}).some((key) => usefulAttributes.has(key) || isInterestingAriaProp(key));
         return (hasUsefulProperties || isInput) ? htmlJsonNode : "";
     }
 

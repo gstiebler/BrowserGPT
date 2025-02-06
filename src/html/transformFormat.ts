@@ -1,8 +1,20 @@
 import _ from "lodash";
 import { HtmlJsonNode } from "./DomToJson";
-import { getNonEmptyProperties } from "./util";
+import { getNonEmptyProperties, textProperties } from "./util";
 
-const textProperties = new Set(["text", "content", "aria-label", "alt", "title"]);
+const getOnePropRecursive = (node: any): any => {
+    if (!node) {
+        return node;
+    }
+    // if the object has only one property, return that property
+    const nonEmptyProperties = getNonEmptyProperties(node);
+    const keys = _.keys(nonEmptyProperties);
+    if (keys.length === 1) {
+        const key = keys[0];
+        return getOnePropRecursive(nonEmptyProperties[key]);
+    }
+}
+
 
 function transformFormatRecursive(node: any): any {
     if (_.isString(node)) {
@@ -29,15 +41,16 @@ function transformFormatRecursive(node: any): any {
 
     } else if (mainOutputKeys.length === 1) {
         const firstKey = mainOutputKeys[0];
-        if (textProperties.has(firstKey)) {
-            result.push(mainOutput[firstKey]);
-        } else {
-            result.push(mainOutput);
+        const value = textProperties.has(firstKey) ? mainOutput[firstKey] : mainOutput;
+        const processedValue = getOnePropRecursive(value);
+        if (processedValue) {
+            result.push(processedValue);
         }
     } else {
         result.push(mainOutput);
     }
 
+    // Removes redundant arrays
     if (result.length === 1) {
         return result[0];
     }

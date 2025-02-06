@@ -4,10 +4,13 @@ export const forbiddenTypes = new Set(["meta", "script", "style", "#comment"]);
 export const usefulTypes = new Set(["input", "textarea", "select", "button"]);
 
 export const usefulAttributes = new Set(["text", "value", "title", "placeholder"]);
-export const interestingProps = new Set(["role", "type", "placeholder", "value", "href", "title", "id"]);
+export const interestingProps = new Set(["role", "type", "placeholder", "value", "href", "title", "id", "class"]);
+export const textProperties = new Set(["text", "content", "aria-label", "alt", "title"]);
 const interestingAriaProps = new Set(["aria-label", "aria-labelledby", "aria-describedby", "aria-details", "aria-placeholder", "aria-roledescription", "aria-valuetext"]);
 
-export const isInterestingAriaProp = (key: string) => interestingAriaProps.has(key);
+// export const isInterestingAriaProp = (key: string) => interestingAriaProps.has(key);
+
+export const isInterestingAriaProp = (key: string) =>  key.startsWith("aria-");
 
 export function getNonEmptyProperties(obj: any) {
     return Object.entries(obj)
